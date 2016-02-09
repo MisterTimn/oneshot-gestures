@@ -14,12 +14,12 @@ convnet = convnet.convnet()
 Initialize output File-ID and file
 """
 i = 0
-while os.path.exists("output/06-05/acc-cost_%s.csv" % i):
+while os.path.exists("output/acc-cost_%s.csv" % i):
     i += 1
 print "File-ID: %s" % i
-fo1 = open("output/06-05/acc-cost_%s.csv" % i, "w")
+fo1 = open("output/acc-cost_%s.csv" % i, "w")
 
-save_param_path = "model_params/param_model"
+save_param_path = "model_parameters/param_model"
 
 x_validate, labels_validate = load.load_validation_set()
 x_train, t_train = load.load_training_set()

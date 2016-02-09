@@ -26,7 +26,7 @@ class convnet(object):
 
 		l4 = nn.layers.DenseLayer(nn.layers.dropout(l_pool3, p=0.5), num_units=100)
 
-		self.l_out = nn.layers.DenseLayer(l4, num_units=20, nonlinearity=T.nnet.softmax)
+		self.l_out = nn.layers.DenseLayer(l4, num_units=19, nonlinearity=T.nnet.softmax)
 
 		self.L1 = 0.
 		self.L2 = 0.0001

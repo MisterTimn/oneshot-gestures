@@ -11,20 +11,26 @@ class load(object):
         print "Initializing load_module..."
         start_time=time.time()
 
-        data_path = "/home/jasper/Thesis/data-chalearn/"
+        data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
         """
         data_revised
         data_oneshotlearning
         """
+        # file = h5py.File(data_path+"data_oneshotlearning.hdf5","r")
+        
+        # # self.samples = file["samples_oneshot"] 
+        # # self.labels = file["labels_oneshot"]
+        # # self.labels_original = file["labels_original_oneshot"]
+
+        # self.samples = file["samples_19cl"]
+        # self.labels = file["labels_19cl"]
+        # self.labels_original = file["labels_original_19cl"]
+        
         file = h5py.File(data_path+"data_revised.hdf5","r")
-        
-        # self.samples = file["samples_oneshot"] 
-        # self.labels = file["labels_oneshot"]
-        # self.labels_original = file["labels_original_oneshot"]
-        
+
         self.samples = file["samples"] 
         self.labels = file["labels"]
-        self.labels_original = file["labels_original"]
+        self.labels_original = file["labels_original"]       
 
         self.sample_size = int((self.samples.shape[0])*size_ratio)
 
