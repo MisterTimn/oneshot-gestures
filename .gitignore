@@ -1,6 +1,7 @@
 # Application specific ignores
 data-chalearn/
 output/
+*.py~
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

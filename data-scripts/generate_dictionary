@@ -1,0 +1,24 @@
+import h5py
+import theano
+import numpy as np
+import pickle
+
+import load_class
+load == load_class.load(1)
+
+labels_validate = load.load_validation_set()
+t_train = load.load_training_set()
+labels_test = load.load_testing_set()
+
+train_dict = {}
+
+for i in range(0, len(t_train)):
+	if t_train[i] not in train_dict:
+		train_dict[i] = []
+	train_dict[t_train[i]].append(i)
+	
+sum = 0
+for i in range(20):
+	sum += len(train_dict[i])
+	print len(train_dict[i])
+

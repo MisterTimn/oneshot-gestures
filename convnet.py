@@ -44,11 +44,8 @@ class convnet(object):
 		params = nn.layers.get_all_params(self.l_out)
 		updates = nn.updates.nesterov_momentum(cost_train, params, learning_rate=0.001, momentum=0.9)
 
-		print "Start compiling theano functions"
 		# compile theano functions
 		self.train = theano.function([l_in.input_var, objective.target_var], cost_train, updates=updates)
-
-		print "Finished compiling train"
 
 		self.predict = theano.function([l_in.input_var], y)
 

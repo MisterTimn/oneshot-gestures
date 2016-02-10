@@ -20,6 +20,7 @@ print "File-ID: %s" % i
 fo1 = open("output/acc-cost_%s.csv" % i, "w")
 
 save_param_path = "model_parameters/param_model"
+convnet.load_param_values("model_parameters/param_model")
 
 x_validate, labels_validate = load.load_validation_set()
 x_train, t_train = load.load_training_set()
@@ -78,7 +79,7 @@ except:
 
 convnet.save_param_values(save_param_path)
 
-x_test, labels_test = load.Load_testing_set()
+x_test, labels_test = load.load_testing_set()
 predictions_test = convnet.predict(x_test)
 test_accuracy = np.mean(predictions_test == labels_test)
 
