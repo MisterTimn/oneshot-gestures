@@ -20,12 +20,12 @@ print "File-ID: %s" % i
 fo1 = open("output/acc-cost_%s.csv" % i, "w")
 
 save_param_path = "model_parameters/param_model"
-convnet.load_param_values("model_parameters/param_model")
+#convnet.load_param_values("model_parameters/param_model")
 
 x_validate, labels_validate = load.load_validation_set()
 x_train, t_train = load.load_training_set()
 
-batch_size = 20
+batch_size = 10
 iterationIndex=0
 x=raw_input("Number of iterations to perform: ")
 while(not x.isdigit()):

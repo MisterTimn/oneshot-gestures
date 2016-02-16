@@ -15,16 +15,18 @@ class convnet(object):
         # define model: neural network
 		l_in = nn.layers.InputLayer((None, 12, 64, 64))
 
-		l_conv1 = nn.layers.Conv2DLayer(l_in, num_filters=4, filter_size=(5, 5))
+		l_conv1 = nn.layers.Conv2DLayer(l_in, num_filters=8, filter_size=(5, 5))
 		l_pool1 = nn.layers.MaxPool2DLayer(l_conv1, ds=(2, 2))
 
-		l_conv2 = nn.layers.Conv2DLayer(l_pool1, num_filters=8, filter_size=(5, 5))
+		l_conv2 = nn.layers.Conv2DLayer(l_pool1, num_filters=16, filter_size=(5, 5))
 		l_pool2 = nn.layers.MaxPool2DLayer(l_conv2, ds=(2, 2))
 
-		l_conv3 = nn.layers.Conv2DLayer(l_pool2, num_filters=16, filter_size=(4,4))
+		l_conv3 = nn.layers.Conv2DLayer(l_pool2, num_filters=32, filter_size=(4,4))
 		l_pool3 = nn.layers.MaxPool2DLayer(l_conv3, ds=(2,2))
 
-		l4 = nn.layers.DenseLayer(nn.layers.dropout(l_pool3, p=0.5), num_units=100)
+		l4 = nn.layers.DenseLayer(nn.layers.dropout(l_pool3, p=0.5), num_units=800)
+
+		l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=100)
 
 		self.l_out = nn.layers.DenseLayer(l4, num_units=19, nonlinearity=T.nnet.softmax)
 
