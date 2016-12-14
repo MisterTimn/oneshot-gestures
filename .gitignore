@@ -1,6 +1,8 @@
 # Application specific ignores
 data-chalearn/
-output/
+archive/
+backups/
+.idea/
 *.py~
 
 # Byte-compiled / optimized / DLL files

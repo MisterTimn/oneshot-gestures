@@ -11,77 +11,109 @@ import lasagne as nn
 
 class convnet(object):
 
-	def __init__(self):
+	def __init__(self, num_output_units=20):
+		print "Initializing convnet model"
         # define model: neural network
-		l_in = nn.layers.InputLayer((None, 12, 64, 64))
+		input_var = T.tensor4("inputs")
+		target_var = T.ivector("targets")
 
-		l_conv1 = nn.layers.Conv2DLayer(l_in, num_filters=8, filter_size=(5, 5))
-		l_pool1 = nn.layers.MaxPool2DLayer(l_conv1, ds=(2, 2))
+		input = nn.layers.InputLayer(		shape=(None, 12, 64, 64),
+											input_var=input_var	)
 
-		l_conv2 = nn.layers.Conv2DLayer(l_pool1, num_filters=16, filter_size=(5, 5))
-		l_pool2 = nn.layers.MaxPool2DLayer(l_conv2, ds=(2, 2))
+		conv1 = nn.layers.Conv2DLayer(	    input,
+											num_filters=8, filter_size=(5, 5),
+											nonlinearity=nn.nonlinearities.rectify,
+											W=nn.init.GlorotUniform()	)
+		pool1 = nn.layers.MaxPool2DLayer(	conv1, pool_size=(2, 2))
 
-		l_conv3 = nn.layers.Conv2DLayer(l_pool2, num_filters=32, filter_size=(4,4))
-		l_pool3 = nn.layers.MaxPool2DLayer(l_conv3, ds=(2,2))
+		conv2 = nn.layers.Conv2DLayer(	    pool1 ,
+											num_filters=16, filter_size=(5, 5),
+											nonlinearity=nn.nonlinearities.rectify	)
+		pool2 = nn.layers.MaxPool2DLayer(	conv2, pool_size=(2, 2)	)
 
-		l4 = nn.layers.DenseLayer(nn.layers.dropout(l_pool3, p=0.5), num_units=800)
+		conv3 = nn.layers.Conv2DLayer(	    pool2,
+											num_filters=32, filter_size=(4,4),
+											nonlinearity=nn.nonlinearities.rectify	)
+		pool3 = nn.layers.MaxPool2DLayer(   conv3, pool_size=(2,2))
 
-		l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=100)
+		dense1 = nn.layers.DenseLayer(		nn.layers.dropout(pool3, p=0.5),
+											num_units=800,
+											nonlinearity=nn.nonlinearities.rectify	)
 
-		self.l_out = nn.layers.DenseLayer(l4, num_units=19, nonlinearity=T.nnet.softmax)
+		dense2 = nn.layers.DenseLayer(		nn.layers.dropout(dense1, p=0.5),
+											num_units=100,
+											nonlinearity=nn.nonlinearities.rectify	)
 
-		self.L1 = 0.
-		self.L2 = 0.0001
-		params = nn.layers.get_all_non_bias_params(self.l_out)
-		self.L1_term = sum(T.sum(T.abs_(p)) for p in params)
-		self.L2_term = sum(T.sum(p**2) for p in params)
+		self.network = nn.layers.DenseLayer(dense2,
+											num_units=num_output_units,
+											nonlinearity=nn.nonlinearities.softmax	)
 
-		objective = nn.objectives.Objective(self.l_out, loss_function = self.loss)
+		L1 = 0.
+		L2 = 0.0001	
+		l2_penalty = nn.regularization.regularize_network_params(self.network, nn.regularization.l2)
+		# l1_penalty = nn.regularization.regularize_network_params(self.network, nn.regularization.l1)
+		# params = nn.layers.get_all_params(self.network)
+		# self.L1_term = sum(T.sum(T.abs_(p)) for p in params)
+		# self.L2_term = sum(T.sum(p**2) for p in params)
 
-		cost_train = objective.get_loss()
+		prediction  = nn.layers.get_output(self.network)
+		loss = nn.objectives.categorical_crossentropy(prediction, target_var)
+		loss = loss.mean()
+		loss = loss + l2_penalty * L2 #+ l1_penalty * L1
 
-		p_y_given_x = self.l_out.get_output(deterministic=True)
-		y = T.argmax(p_y_given_x, axis=1)
 
-		params = nn.layers.get_all_params(self.l_out)
-		updates = nn.updates.nesterov_momentum(cost_train, params, learning_rate=0.001, momentum=0.9)
+		params = nn.layers.get_all_params(self.network, trainable=True)
 
-		# compile theano functions
-		self.train = theano.function([l_in.input_var, objective.target_var], cost_train, updates=updates)
+		updates = nn.updates.nesterov_momentum(	loss, params,
+												learning_rate=0.0001,
+												momentum=0.9)
 
-		self.predict = theano.function([l_in.input_var], y)
+		test_prediction = nn.layers.get_output(	self.network, deterministic=True	)
+		test_loss = nn.objectives.categorical_crossentropy(test_prediction, target_var)
+		test_loss = test_loss.mean()
 
-		self.test_output = theano.function([l_in.input_var], p_y_given_x)
+		test_acc = T.mean(	T.eq(	T.argmax(test_prediction, axis=1), target_var),
+							dtype=theano.config.floatX)
 
-	def log_loss(self, y, t, eps=1e-15):
-	    """
-	    cross entropy loss, summed over classes, mean over batches
-	    """
-	    y = T.clip(y, eps, 1 - eps)
-	    loss = -T.sum(t * T.log(y)) / y.shape[0].astype(theano.config.floatX)
-	    return loss
+		print "Compiling train function"
+		self.train = theano.function([input_var, target_var], loss, updates=updates)
 
-	def loss(self, y, t):
-		"""
-		loss function definition
-		"""
-		return self.log_loss(y, t) + self.L1 * self.L1_term + self.L2 * self.L2_term	
+		print "Compiling validation function"
+		self.validate = theano.function([input_var, target_var], [test_loss, test_acc])
+
+		print "Functions compiled, convnet model initialized"
+		# self.test_output = theano.function([l_in.input_var], test_prediction)
+
+	# def log_loss(self, y, t, eps=1e-15):
+	#     """
+	#     cross entropy loss, summed over classes, mean over batches
+	#     """
+	#     y = T.clip(y, eps, 1 - eps)
+	#     loss = -T.sum(t * T.log(y)) / y.shape[0].astype(theano.config.floatX)
+	#     return loss
+
+	# def loss(self, y, t):
+	# 	"""
+	# 	loss function definition
+	# 	"""
+	# 	return self.log_loss(y, t) + self.L1 * self.L1_term + self.L2 * self.L2_term	
 
 	def save_param_values(self, path):
-		param_values = nn.layers.get_all_param_values(self.l_out)
+		param_values = nn.layers.get_all_param_values(self.network)
 		with open(path, 'wb') as f:
 			pickle.dump(param_values,f)
 
 	def load_param_values(self, path):
 		with open(path, 'rb') as f:
 			param_values = pickle.load(f)
-		nn.layers.set_all_param_values(self.l_out,param_values)
+		nn.layers.set_all_param_values(self.network,param_values)
 
-	def train(self, x_batch, t_batch):
-		return self.train(x_batch, t_batch)
+	def train(self, x_batch, y_batch):
+		return self.train(x_batch, y_batch)
 
-	def predict(self, x_validate):
-		return self.predict(x_validate)
+	def validate(self, x_validate, y_validate):
+		print("validating")
+		return self.validate(x_validate, y_validate)
 
 	# def trunc_to(min,max,m):
 	# 	for i in range(int(m.shape[0])):
