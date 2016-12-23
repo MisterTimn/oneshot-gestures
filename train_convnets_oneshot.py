@@ -20,19 +20,19 @@ def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
         excerpt = indices[start_idx:start_idx + batch_size]
         yield inputs[excerpt], targets[excerpt]
 
-def iterate_minibatches_oneshot(inputs, targets, oneshot_indices, oneshot_class, batch_size, shuffle=False):
+def iterate_minibatches_oneshotv2(inputs, targets, oneshot_indices, oneshot_class, batch_size, shuffle=False):
     assert len(inputs) == len(targets)
     i = 0
     indices=[]
-    for index in np.arange(len(inputs)):
-        if ( i < len(oneshot_indices[oneshot_class]) and index == oneshot_indices[oneshot_class][i]):
-            indices.append(index)
-            i+=1
+    for class_num in xrange(20):
+        indices.extend(oneshot_indices[class_num][:20])
     if shuffle:
         np.random.shuffle(indices)
     for start_idx in range(0, len(indices) - batch_size + 1, batch_size):
         excerpt = indices[start_idx:start_idx + batch_size]
         yield inputs[excerpt], targets[excerpt]
+
+
 
 
 
@@ -48,13 +48,14 @@ for num_layers in [1,2,3]:
     convnet = convnet_oneshot.convnet_oneshot(num_output_units=20, num_layers_retrain=num_layers)
     #convnet.save_param_values("{}/default_param".format(base_dir_path))
 
-    for oneshot_class in [2,8,9,18]:
+    # [2,8,9,18]
+    for oneshot_class in [0,2,4,8,9,14,17,18]:
         print("Oneshotting class {}".format(oneshot_class))
 
         save_param_path = "{}convnet_params/param-oneshot-class{}-layers-{}".format(base_dir_path, oneshot_class, num_layers)
 
         # Load trained model excluding the class we want to oneshot
-        convnet.load_param_values("{}convnet_params/param-excl-class-{}".format(base_dir_path,oneshot_class))
+        convnet.load_param_values("{}convnet_params/excluding/param-excl-class-{}".format(base_dir_path,oneshot_class))
         try:
             fo1 = open("{}output_19cl/oneshot-{}-layers-{}.csv".format(base_dir_path,oneshot_class,num_layers),"w")
             fo1.write("training_loss;validation_loss;validation_accuracy;epoch_time\n")
@@ -71,13 +72,15 @@ for num_layers in [1,2,3]:
 
         batch_size = 20
         min_val_err = 20
-        num_epochs = 100
+        num_epochs = 50
         for epoch in range(num_epochs):
 
             train_err = 0
             train_batches = 0
             start_time = time.time()
-            for batch in iterate_minibatches(x_train,labels_train,batch_size,True):
+            for batch in iterate_minibatches_oneshotv2(x_train,labels_train,
+                                             indices_train, oneshot_class,
+                                             batch_size,True):
                 inputs, targets = batch
                 train_err += convnet.train(inputs, targets)
                 train_batches += 1

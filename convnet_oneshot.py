@@ -84,6 +84,8 @@ class convnet_oneshot(object):
         test_acc = T.mean(	T.eq(	T.argmax(test_prediction, axis=1), target_var),
                             dtype=theano.config.floatX)
 
+        output = T.argmax(test_prediction,axis=1)
+
         print('Compiling train function')
         self.train = theano.function([input_var, target_var], loss, updates=updates)
 
@@ -91,7 +93,7 @@ class convnet_oneshot(object):
         self.validate = theano.function([input_var, target_var], [test_loss, test_acc])
 
         print("Functions compiled, convnet model initialized")
-        # self.test_output = theano.function([l_in.input_var], test_prediction)
+        self.test_output = theano.function([input_var], output)
 
     # def log_loss(self, y, t, eps=1e-15):
     #     """

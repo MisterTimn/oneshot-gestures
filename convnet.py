@@ -81,8 +81,8 @@ class convnet(object):
 		print "Compiling validation function"
 		self.validate = theano.function([input_var, target_var], [test_loss, test_acc])
 
+		self.test_output = theano.function([input_var], test_prediction)
 		print "Functions compiled, convnet model initialized"
-		# self.test_output = theano.function([l_in.input_var], test_prediction)
 
 	# def log_loss(self, y, t, eps=1e-15):
 	#     """
