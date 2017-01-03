@@ -4,6 +4,7 @@ import numpy as np
 import os
 import time
 
+
 data_ratio = 1.0
 
 # O(n)
@@ -31,6 +32,9 @@ load = load_class.load(data_ratio)
 import convnet
 convnet = convnet.convnet(20)
 
+import augmentation as aug
+augmenter = aug.augmenter()
+
 try:
     i = 0
     path = "/home/jasper/oneshot-gestures/"
@@ -44,7 +48,8 @@ except IOError as e:
 except:
     print("unexpected error")
     raise
-save_param_path = "{}model_parameters/param_model_19_2".format(path)
+
+save_param_path = "{}convnet_params/param_model_20_augmented".format(path)
 #convnet.load_param_values("model_parameters/param_model")
 print("Loading data")
 sys.stdout.flush()
@@ -81,7 +86,9 @@ try:
                                              oneshot_indices_train,
                                              oneshot_class, batch_size,
                                              shuffle=True):
-                inputs, targets = batch
+                inputs_pre_aug, targets = batch
+                inputs = augmenter.scale_crop(augmenter.rotate_crop(inputs_pre_aug))
+
                 print('\rTraining phase {:6.1f}%'.format(train_batches * batch_size / train_size * 100), end="");sys.stdout.flush()
                 train_err += convnet.train(inputs, targets)
                 train_batches += 1

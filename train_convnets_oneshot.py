@@ -57,7 +57,7 @@ for num_layers in [1,2,3]:
         # Load trained model excluding the class we want to oneshot
         convnet.load_param_values("{}convnet_params/excluding/param-excl-class-{}".format(base_dir_path,oneshot_class))
         try:
-            fo1 = open("{}output_19cl/oneshot-{}-layers-{}.csv".format(base_dir_path,oneshot_class,num_layers),"w")
+            fo1 = open("{}output/oneshot-{}-layers-{}.csv".format(base_dir_path,oneshot_class,num_layers),"w")
             fo1.write("training_loss;validation_loss;validation_accuracy;epoch_time\n")
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))

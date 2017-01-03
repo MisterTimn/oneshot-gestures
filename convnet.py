@@ -65,7 +65,7 @@ class convnet(object):
 		params = nn.layers.get_all_params(self.network, trainable=True)
 
 		updates = nn.updates.nesterov_momentum(	loss, params,
-												learning_rate=0.0001,
+												learning_rate=0.001,
 												momentum=0.9)
 
 		test_prediction = nn.layers.get_output(	self.network, deterministic=True	)
