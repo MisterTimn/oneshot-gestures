@@ -63,7 +63,8 @@ def worker(q):
             start_index=0
         if ((cmd == 'batch' or cmd == 'epoch') and start_index < len(indices)):
             excerpt = indices[start_index:start_index+batch_size]
-            images = augmenter.transfMatrix(samples[excerpt])
+            #images = augmenter.transfMatrix(samples[excerpt])
+            images=samples[excerpt]
             np.copyto(sharedSampleArray,images)
             np.copyto(sharedLabelArray,labels[excerpt])
             start_index+=batch_size
@@ -125,7 +126,7 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         #convnet.load_param_values(save_param_path)
-        num_epochs = 100
+        num_epochs = 600
         for j in xrange(num_epochs):
             #Initialise new random permutation of data
             #And load first batch of augmented samples
