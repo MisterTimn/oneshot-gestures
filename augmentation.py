@@ -11,9 +11,9 @@ from math import pi,sin,cos
 class augmenter(object):
     default_augmentation_params = {
         'zoom_range': (1 / 1.2, 1.2),
-        'rotation_range': (-1, 1),
+        'rotation_range': (-2, 2),
         'shear_range': (0, 0),
-        'translation_range': (0, 0),
+        'translation_range': (-2, 2),
         'do_flip': False,
         'allow_stretch': True,
     }

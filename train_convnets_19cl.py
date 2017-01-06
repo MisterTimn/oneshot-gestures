@@ -40,8 +40,7 @@ x_test, labels_test, indices_test = load.load_testing_set()
 convnet = convnet.convnet(num_output_units=20)
 convnet.save_param_values("{}/default_param".format(base_dir_path))
 
-for oneshot_class in xrange(20
-                            ):
+for oneshot_class in xrange(20):
     print("Learning gestures excluding class {}".format(oneshot_class))
 
     save_param_patch = "{}convnet_params/param-excl-class-{}".format(base_dir_path,oneshot_class)
