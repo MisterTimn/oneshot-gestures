@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet
+import convnet_oneshot
 
 # O(n)
 # Return mini batches, dynamically excluding the indices of the oneshot class
@@ -37,7 +37,7 @@ x_validate, labels_validate, indices_validate = load.load_validation_set()
 x_train, labels_train, indices_train = load.load_training_set()
 x_test, labels_test, indices_test = load.load_testing_set()
 
-convnet = convnet.convnet(num_output_units=20)
+convnet = convnet_oneshot.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
 convnet.save_param_values("{}/default_param".format(base_dir_path))
 
 for oneshot_class in xrange(20):

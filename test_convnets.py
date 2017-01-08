@@ -10,6 +10,12 @@ print("Importing convnet")
 import convnet_oneshot
 import os
 
+false_positives = np.zeros(20, dtype=np.int)
+errors = np.zeros(20, dtype=np.int)
+total = np.zeros(20, dtype=np.int)
+
+total_errors = 0
+
 # O(n)
 # Return mini batches, dynamically excluding the indices of the oneshot class
 def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
@@ -21,25 +27,37 @@ def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
         excerpt = indices[start_idx:start_idx + batch_size]
         yield inputs[excerpt], targets[excerpt]
 
-def getParamOneshotPath(class_num,number_of_layers_retrained):
-    return "/home/jasper/oneshot-gestures/convnet_params/oneshot/alpha-001/param-oneshot-class{}-layers-{}".format(class_num,number_of_layers_retrained)
+def getParamPath(class_num, number_of_layers_retrained, num_samples):
+    return "/home/jasper/oneshot-gestures/convnet_params/param-oneshot{}-layers{}-samples{}"\
+        .format(class_num,number_of_layers_retrained,num_samples)
 
 def getParamExcludingPath(class_num):
-    return "/home/jasper/oneshot-gestures/convnet_params/excluding/param-excl-class-{}".format(class_num)
+    return "/home/jasper/oneshot-gestures/convnet_params/param-excl{}".format(class_num)
 
 def filterFalsePredictions(targets, predictions):
     assert(len(targets)==len(predictions))
-    print("{:5}-->{:5}".format("Label","Predict"))
+    global total_errors
+
     for i in xrange(len(targets)):
+        total[targets[i]]+=1
         if(targets[i] != predictions[i]):
-            print("{:5}-->{:5}".format(targets[i],predictions[i]))
+            total_errors += 1
+            errors[targets[i]] += 1
+            false_positives[predictions[i]] += 1
 
 def main():
     convnet = convnet_oneshot.convnet_oneshot()
     load = load_class.load()
     x_test, labels_test, indices_test = load.load_testing_set()
 
-    for class_num in [17]:
+    num_layers_retrained = 1
+    class_num = 15
+    global errors
+    global total
+    global false_positives
+    global total_errors
+
+    for num_samples in [200,100,50]:
 
         # convnet.load_param_values(getParamExcludingPath(class_num))
         # test_err = 0
@@ -54,7 +72,13 @@ def main():
         #     test_batches += 1
         # print("\ttest-acc:{:7.3f}%".format(test_acc / test_batches * 100))
 
-        convnet.load_param_values(getParamOneshotPath(class_num,2))
+        errors = np.zeros(20, dtype=np.int)
+        total = np.zeros(20, dtype=np.int)
+        false_positives = np.zeros(20, dtype=np.int)
+        total_errors=0
+        convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
+        #convnet.load_param_values(getParamExcludingPath(class_num))
+        # convnet.load_param_values("/home/jasper/oneshot-gestures/convnet_params/param-allclasses")
         test_err = 0
         test_acc = 0
         test_batches = 0
@@ -65,7 +89,16 @@ def main():
             test_err += err
             test_acc += acc
             test_batches += 1
-        print("\ttest-acc:{:7.3f}%".format(test_acc / test_batches * 100))
+
+        print("class\terror\tfalse pos")
+        for class_index in range(20):
+            print("{:2}:\t{:5.2f}%\t{:5.2f}%"
+                  .format(class_index,
+                          100.0*errors[class_index] / total[class_index],
+                          100.0*false_positives[class_index] / total_errors))
+        print("\nTEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
+
+
 
 
 if __name__ == "__main__":
