@@ -1,0 +1,28 @@
+(7 jan 2017)
+20 classes test-acc: 79.00%
+50,000 backpropagations
+validation every 200 backprops
+
+modelparameters: "param-convnets/param-excl17"
+ERROR RATES:
+0:  29.03%
+1:  14.71%
+2:  22.22%
+3:  17.00%
+4:   7.92%
+5:  14.53%
+6:  23.08%
+7:  24.30%
+8:   0.93%
+9:  44.33%
+10:  25.74%
+11:  18.81%
+12:   5.32%
+13:  24.27%
+14:  30.34%
+15:   2.04%
+16:   5.83%
+17:  100.00%
+18:   9.68%
+19:   6.73%
+

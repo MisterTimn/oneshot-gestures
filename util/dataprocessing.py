@@ -84,7 +84,7 @@ class DataPlotter:
     def plotCompare(self,list_of_data):
         plt.grid(True)
         for data in list_of_data:
-            plt.plot(data)
+            plt.plot(data, 'o')
 
         plt.show()
 

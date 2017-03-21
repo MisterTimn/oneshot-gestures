@@ -123,7 +123,6 @@ class convnet_oneshot(object):
         return self.train(x_batch, y_batch)
 
     def validate(self, x_validate, y_validate):
-        print("validating")
         return self.validate(x_validate, y_validate)
 
     # def trunc_to(min,max,m):
