@@ -161,7 +161,7 @@ class augmenter(object):
         """
         This wrapper function is faster than skimage.transform.warp
         """
-        m = tf._matrix  # tf._matrix is
+        m = tf.params  # tf._matrix is
         return skimage.transform._warps_cy._warp_fast(img, m, output_shape=output_shape, mode=mode, order=order)
 
     def random_perturbation_transform(self, zoom_range, rotation_range, shear_range, translation_range, do_flip=True,

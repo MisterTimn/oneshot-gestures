@@ -6,7 +6,6 @@ import numpy as np
 import sys
 import time
 import os
-from skimage.viewer import ImageViewer
 
 import augmentation as aug
 import convnet_oneshot
@@ -51,8 +50,8 @@ def worker_backprop(q):
         if cmd == 'done':
             done = True
         elif cmd == 'batch':
-            classes = np.random.randint(num_classes,size=batch_size)
-            # classes = np.random.choice(class_choices,batch_size)
+            #classes = np.random.randint(num_classes,size=batch_size)
+            classes = np.random.choice(class_choices,batch_size)
             for i in xrange(batch_size):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
@@ -124,13 +123,13 @@ def test():
 
 if __name__=='__main__':
     try:
+        sharedSampleArray = sa.create("shm://samples", (batch_size, 12, 64, 64), dtype='float32')
+        sharedLabelArray = sa.create("shm://labels", batch_size, dtype='int32')
+
         q = mp.JoinableQueue()
         proc = mp.Process(target=worker_backprop, args=[q])
         proc.daemon = True
         proc.start()
-
-        sharedSampleArray   = sa.create("shm://samples", (batch_size, 12, 64, 64), dtype='float32')
-        sharedLabelArray    = sa.create("shm://labels", batch_size, dtype='int32')
 
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
@@ -141,7 +140,7 @@ if __name__=='__main__':
         # retrain_layers=3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [200,100]:
+        for num_oneshot_samples in [200]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
 
@@ -152,6 +151,8 @@ if __name__=='__main__':
                 # indices_train[oneshot_class] = indices_train[oneshot_class][:num_oneshot_samples]
                 # print(len(indices_train[oneshot_class]))
                 # save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
+                # if (os.path.exists(save_param_path)):
+                #     os.makedirs(save_param_path)
                 # convnet.load_param_values("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
 
                 ###
@@ -159,9 +160,11 @@ if __name__=='__main__':
                 ###
                 convnet = cnn.convnet(num_output_units=20)
                 save_param_path = "{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class)
+                convnet.load_param_values(save_param_path)
                 q.put('oneshot')
                 q.put(oneshot_class)
                 min_val_err=20
+                q.join()
 
                 ###
                 # In case there is need to load old params to continue training
@@ -196,7 +199,7 @@ if __name__=='__main__':
                             print("\t{:5.0f}%".format(100.0 * (i+1) / backprops_per_epoch), end="");sys.stdout.flush()
 
                             q.join()
-
+                        print("test")
                         train_loss = train_err / backprops_per_epoch
                         val_loss, val_acc, class_acc = validate()
 
@@ -219,7 +222,7 @@ if __name__=='__main__':
                     print("test-acc:{:5.2f}%".format(test_acc * 100))
 
                     # directory = "{}output/datav2-{}-retrain-{}-samples-{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
-                    directory = "{}output/data-{}/".format(base_dir_path, oneshot_class)
+                    directory = "{}output/data3-{}/".format(base_dir_path, oneshot_class)
                     if not os.path.exists(directory):
                         os.makedirs(directory)
                     ds.saveToArray(directory)
