@@ -1,8 +1,8 @@
 import sys
 import os
 
-path = "/Users/jaspervaneessen/GitHub/oneshot-gestures/output/datav2-15-retrain-1-samples-1/acc_loss.csv"
-path2 = "/Users/jaspervaneessen/GitHub/oneshot-gestures/output/datav2-15-retrain-1-samples-1/data.csv"
+path = "/Users/jaspervaneessen/GitHub/oneshot-gestures/output/datav2-15-retrain-2-samples-2/acc_loss.csv"
+path2 = "/Users/jaspervaneessen/GitHub/oneshot-gestures/output/datav2-15-retrain-2-samples-2/data.csv"
 
 with open(path, "r") as in_f, open(path2, "w") as out_f:
     lines = in_f.readlines()
