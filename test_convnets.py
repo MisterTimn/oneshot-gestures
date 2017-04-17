@@ -62,7 +62,7 @@ def main():
     global total_errors
 
     num_samples = 5
-    for num_samples in [5,2,1]:
+    for num_samples in [200,100,50,25,10,5,2,1]:
         for num_layers_retrained in [3,2,1]:
         # num_layers_retrained = 3
         # for num_samples in [200,100,50,25,10]:
