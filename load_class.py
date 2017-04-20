@@ -1,6 +1,5 @@
 from __future__ import print_function
 import h5py
-#import theano
 import numpy as np
 import sys
 
@@ -13,7 +12,8 @@ class load(object):
         print
         print("Initializing load_module... (0/4)",end="")
         sys.stdout.flush()
-        data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
+        #data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
+        data_path = "/home/jveessen/"
 
         file = h5py.File(data_path+"data_ints.hdf5","r")
         print("\rInitializing load_module... (1/4)", end="");sys.stdout.flush()
