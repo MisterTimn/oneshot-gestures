@@ -8,8 +8,8 @@ import time
 import os
 
 import augmentation as aug
-import convnet_oneshot
-import convnet as cnn
+import convnet_oneshot as cnn
+#import convnet as cnn
 import load_class
 from util.dataprocessing import DataSaver
 
@@ -23,16 +23,15 @@ x_test, labels_test, indices_test = loader.load_testing_set()
 
 class_accuracies = np.zeros(20,dtype=np.int)
 
-# convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
-convnet = cnn.convnet(num_output_units=20)
+convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
+# convnet = cnn.convnet(num_output_units=20)
 
-base_dir_path = "/home/jasper/oneshot-gestures/"
+base_dir_path = os.path.dirname(os.path.abspath(__file__)) #"/home/jasper/oneshot-gestures/"
+
+print(base_dir_path)
 
 num_classes = 20
-oneshot_class = 15
-# num_oneshot_samples = 10
-num_samples_per_class = 200
-batch_size=32
+batch_size = 32
 
 def worker_backprop(q):
     #Data voor volgende iteratie ophalen en verwerken
@@ -40,7 +39,6 @@ def worker_backprop(q):
     done = False
     sharedSampleArray = sa.attach("shm://samples")
     sharedLabelArray = sa.attach("shm://labels")
-    start_index=0
     indices = np.empty(batch_size,dtype='int32')
 
     class_choices = []
@@ -50,8 +48,8 @@ def worker_backprop(q):
         if cmd == 'done':
             done = True
         elif cmd == 'batch':
-            #classes = np.random.randint(num_classes,size=batch_size)
-            classes = np.random.choice(class_choices,batch_size)
+            classes = np.random.randint(num_classes,size=batch_size)
+            #classes = np.random.choice(class_choices,batch_size)
             for i in xrange(batch_size):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
@@ -135,36 +133,39 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         #convnet.load_param_values(save_param_path)
-        oneshot_class = 9
+        oneshot_class = 15
+        min_val_err = 20
 
-        # retrain_layers=3
+        # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [200]:
-            for retrain_layers in [1]:
+        for num_oneshot_samples in [0]:
+            for retrain_layers in [3,2,1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
 
                 ###
                 # Code for oneshot training
                 ###
-                # convnet = convnet_oneshot.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
+                convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
                 # indices_train[oneshot_class] = indices_train[oneshot_class][:num_oneshot_samples]
-                # print(len(indices_train[oneshot_class]))
-                # save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
-                # if (os.path.exists(save_param_path)):
-                #     os.makedirs(save_param_path)
-                # convnet.load_param_values("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
+                print(len(indices_train[oneshot_class]))
+                save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
+                if (os.path.exists(save_param_path)):
+                    os.makedirs(save_param_path)
+                convnet.load_param_values("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
+                q.put('oneshot')
+                q.put(oneshot_class)
+                q.join()
 
                 ###
                 # Code for training excluding oneshot class
                 ###
-                convnet = cnn.convnet(num_output_units=20)
-                save_param_path = "{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class)
-                convnet.load_param_values(save_param_path)
-                q.put('oneshot')
-                q.put(oneshot_class)
-                min_val_err=20
-                q.join()
+                # convnet = cnn.convnet(num_output_units=20)
+                # save_param_path = "{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class)
+                # convnet.load_param_values(save_param_path)
+                # q.put('oneshot')
+                # q.put(oneshot_class)
+                # q.join()
 
                 ###
                 # In case there is need to load old params to continue training
@@ -221,8 +222,8 @@ if __name__=='__main__':
                     test_acc = test()
                     print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-                    # directory = "{}output/datav2-{}-retrain-{}-samples-{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
-                    directory = "{}output/data3-{}/".format(base_dir_path, oneshot_class)
+                    directory = "{}output/datav2-{}-retrain-{}-samples-{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
+                    #directory = "{}output/data-{}/".format(base_dir_path, oneshot_class)
                     if not os.path.exists(directory):
                         os.makedirs(directory)
                     ds.saveToArray(directory)
