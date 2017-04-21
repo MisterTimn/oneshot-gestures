@@ -22,9 +22,6 @@ x_test, labels_test, indices_test = loader.load_testing_set()
 
 class_accuracies = np.zeros(20,dtype=np.int)
 
-convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
-# convnet = cnn.convnet(num_output_units=20)
-
 base_dir_path = os.path.dirname(os.path.abspath(__file__)) #"/home/jasper/oneshot-gestures/"
 
 print(base_dir_path)
@@ -87,7 +84,7 @@ def getClassAccuracy(targets, predictions, class_num):
                 predict_count += 1
     return predict_count, class_count
 
-def validate():
+def validate(convnet):
     val_err = 0
     val_acc = 0
     val_batches = 0
@@ -105,7 +102,7 @@ def validate():
         val_batches += 1
     return val_err/val_batches, val_acc/val_batches, class_acc/num_valid_class_acc
 
-def test():
+def test(convnet):
     test_err = 0
     test_acc = 0
     test_batches = 0
@@ -179,7 +176,7 @@ if __name__=='__main__':
                     q.join()
                 print("test")
                 train_loss = train_err / backprops_per_epoch
-                val_loss, val_acc, class_acc = validate()
+                val_loss, val_acc, class_acc = validate(convnet)
 
                 if (val_loss < min_val_err):
                     min_val_err = val_loss
@@ -196,7 +193,7 @@ if __name__=='__main__':
         finally:
 
             convnet.load_param_values(save_param_path)
-            test_acc = test()
+            test_acc = test(convnet)
             print("test-acc:{:5.2f}%".format(test_acc * 100))
 
             directory = "{}output/data_v2-{}/".format(base_dir_path, oneshot_class)
