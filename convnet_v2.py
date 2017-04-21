@@ -1,3 +1,4 @@
+from __future__ import print_function
 import theano
 import theano.tensor as T
 import numpy as np
@@ -9,10 +10,10 @@ plt.ion()
 
 import lasagne as nn
 
-class convnet(object):
+class convnet_oneshot(object):
 
-    def __init__(self, num_output_units=20):
-        print "Initializing convnet model"
+    def __init__(self, num_output_units=20, num_layers_retrain=1):
+        print("Initializing convnet model")
         # define model: neural network
         input_var = T.tensor4("inputs")
         target_var = T.ivector("targets")
@@ -36,17 +37,19 @@ class convnet(object):
                                             nonlinearity=nn.nonlinearities.rectify	)
         pool3 = nn.layers.MaxPool2DLayer(   conv3, pool_size=(2,2))
 
-        dense1 = nn.layers.DenseLayer(		nn.layers.dropout(pool3, p=0.5),
+        self.dense1 = nn.layers.DenseLayer(	nn.layers.dropout(pool3, p=0.5),
                                             num_units=800,
                                             nonlinearity=nn.nonlinearities.rectify	)
 
-        dense2 = nn.layers.DenseLayer(		nn.layers.dropout(dense1, p=0.5),
+        self.dense2 = nn.layers.DenseLayer(	nn.layers.dropout(self.dense1, p=0.5),
                                             num_units=100,
                                             nonlinearity=nn.nonlinearities.rectify	)
 
-        self.network = nn.layers.DenseLayer(dense2,
-                                            num_units=num_output_units,
+        self.network = nn.layers.DenseLayer(self.dense2,
+                                            num_units=num_output_units-1,
                                             nonlinearity=nn.nonlinearities.softmax	)
+
+
 
         L1 = 0.
         L2 = 0.0001
@@ -62,10 +65,18 @@ class convnet(object):
         loss = loss + l2_penalty * L2 #+ l1_penalty * L1
 
 
-        params = nn.layers.get_all_params(self.network, trainable=True)
+        # params = nn.layers.get_all_params(self.network, trainable=True)
+        # params = [  param for param in self.dense2.get_params(trainable=True),
+        #           param for param in self.network.get_params(trainable=True)]
+
+        params = self.network.get_params(trainable=True)
+        if(num_layers_retrain>=2):
+            params.extend(self.dense2.get_params(trainable=True))
+        if(num_layers_retrain>=3):
+            params.extend(self.dense2.get_params(trainable=True))
 
         updates = nn.updates.nesterov_momentum(	loss, params,
-                                                learning_rate=0.001,
+                                                learning_rate=0.0001,
                                                 momentum=0.9)
 
         test_prediction = nn.layers.get_output(	self.network, deterministic=True	)
@@ -75,14 +86,16 @@ class convnet(object):
         test_acc = T.mean(	T.eq(	T.argmax(test_prediction, axis=1), target_var),
                             dtype=theano.config.floatX)
 
-        print "Compiling train function"
+        output = T.argmax(test_prediction,axis=1)
+
+        print('Compiling train function')
         self.train = theano.function([input_var, target_var], loss, updates=updates)
 
-        print "Compiling validation function"
+        print("Compiling validation function")
         self.validate = theano.function([input_var, target_var], [test_loss, test_acc])
 
-        self.test_output = theano.function([input_var], T.argmax(test_prediction, axis=1))
-        print "Functions compiled, convnet model initialized"
+        print("Functions compiled, convnet model initialized")
+        self.test_output = theano.function([input_var], output)
 
     # def log_loss(self, y, t, eps=1e-15):
     #     """
@@ -112,7 +125,6 @@ class convnet(object):
         return self.train(x_batch, y_batch)
 
     def validate(self, x_validate, y_validate):
-        print("validating")
         return self.validate(x_validate, y_validate)
 
     # def trunc_to(min,max,m):

@@ -18,6 +18,9 @@ total_errors = 0
 
 class_accuracies = np.zeros(20, dtype=np.int)
 
+base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
+
+
 # O(n)
 # Return mini batches, dynamically excluding the indices of the oneshot class
 def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
@@ -30,11 +33,11 @@ def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
         yield inputs[excerpt], targets[excerpt]
 
 def getParamPath(class_num, number_of_layers_retrained, num_samples):
-    return "/home/jasper/oneshot-gestures/convnet_params/param-oneshot{}-layers{}-samples{}"\
-        .format(class_num,number_of_layers_retrained,num_samples)
+    return "{}convnet_params/param-oneshot{}-layers{}-samples{}"\
+        .format(base_dir_path,class_num,number_of_layers_retrained,num_samples)
 
 def getParamExcludingPath(class_num):
-    return "/home/jasper/oneshot-gestures/convnet_params/param-excl{}".format(class_num)
+    return "{}convnet_params/param-excl{}".format(base_dir_path,class_num)
 
 def filterFalsePredictions(targets, predictions):
     assert(len(targets)==len(predictions))
@@ -62,8 +65,8 @@ def main():
     global total_errors
 
     num_samples = 5
-    for num_samples in [200,100,50,25,10,5,2,1]:
-        for num_layers_retrained in [3,2,1]:
+    for num_samples in [200]:
+        for num_layers_retrained in [3]:
         # num_layers_retrained = 3
         # for num_samples in [200,100,50,25,10]:
 
@@ -71,9 +74,8 @@ def main():
             total = np.zeros(20, dtype=np.int)
             false_positives = np.zeros(20, dtype=np.int)
             total_errors=0
-            convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
-            # convnet.load_param_values(getParamExcludingPath(class_num))
-            # convnet.load_param_values("/home/jasper/oneshot-gestures/convnet_params/param-allclasses")
+            # convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
+            convnet.load_param_values(getParamExcludingPath(class_num))
             test_err = 0
             test_acc = 0
             test_batches = 0
