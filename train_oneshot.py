@@ -26,7 +26,7 @@ class_accuracies = np.zeros(20,dtype=np.int)
 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
 # convnet = cnn.convnet(num_output_units=20)
 
-base_dir_path = os.path.dirname(os.path.abspath(__file__)) #"/home/jasper/oneshot-gestures/
+base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
 
 num_classes = 20
 batch_size = 32
