@@ -22,7 +22,7 @@ x_test, labels_test, indices_test = loader.load_testing_set()
 
 class_accuracies = np.zeros(20,dtype=np.int)
 
-base_dir_path = os.path.dirname(os.path.abspath(__file__)) #"/home/jasper/oneshot-gestures/"
+base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
 
 print(base_dir_path)
 
