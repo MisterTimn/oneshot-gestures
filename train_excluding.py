@@ -128,7 +128,7 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         #convnet.load_param_values(save_param_path)
-        oneshot_class = 15
+        oneshot_class = 19
         min_val_err = 20
 
         ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
