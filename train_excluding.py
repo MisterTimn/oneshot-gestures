@@ -144,7 +144,7 @@ if __name__=='__main__':
         ###
         # In case there is need to load old params to continue training
         ###
-        # convnet.load_param_values(save_param_path)
+        convnet.load_param_values(save_param_path)
 
         try:
             backprops_per_epoch = 200
@@ -196,7 +196,7 @@ if __name__=='__main__':
             test_acc = test(convnet)
             print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-            directory = "{}output/data_v2-{}/".format(base_dir_path, oneshot_class)
+            directory = "{}output/data_v2_2-{}/".format(base_dir_path, oneshot_class)
             if not os.path.exists(directory):
                 os.makedirs(directory)
             ds.saveToArray(directory)
