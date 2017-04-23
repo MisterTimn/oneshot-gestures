@@ -8,7 +8,7 @@ import time
 import os
 
 import augmentation as aug
-import convnet_oneshot as cnn
+import convnet_v2_oneshot as cnn
 #import convnet as cnn
 import load_class
 from util.dataprocessing import DataSaver
@@ -130,7 +130,7 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
-        oneshot_class = 15
+        oneshot_class = 19
         min_val_err = 20
 
         # retrain_layers = 3
@@ -146,9 +146,8 @@ if __name__=='__main__':
                 save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 if (os.path.exists(save_param_path)):
                     os.makedirs(save_param_path)
-                convnet.load_param_values("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
-                q.put('oneshot')
-                q.put(oneshot_class)
+
+                convnet.preload_excluding_model("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
                 q.join()
 
                 ###
