@@ -22,7 +22,7 @@ x_test, labels_test, indices_test = loader.load_testing_set()
 
 class_accuracies = np.zeros(20,dtype=np.int)
 
-base_dir_path = os.path.dirname(os.path.abspath(__file__)) #"/home/jasper/oneshot-gestures/"
+base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
 
 print(base_dir_path)
 
@@ -128,14 +128,14 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         #convnet.load_param_values(save_param_path)
-        oneshot_class = 15
+        oneshot_class = 19
         min_val_err = 20
 
         ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
 
         convnet = cnn.convnet(num_output_units=20)
         save_param_path = "{}convnet_params/paramv_v2-excl{}".format(base_dir_path,oneshot_class)
-        if (os.path.exists(save_param_path)):
+        if (not os.path.exists(save_param_path)):
             os.makedirs(save_param_path)
         q.put('oneshot')
         q.put(oneshot_class)
@@ -144,7 +144,7 @@ if __name__=='__main__':
         ###
         # In case there is need to load old params to continue training
         ###
-        # convnet.load_param_values(save_param_path)
+        convnet.load_param_values(save_param_path)
 
         try:
             backprops_per_epoch = 200
@@ -196,7 +196,7 @@ if __name__=='__main__':
             test_acc = test(convnet)
             print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-            directory = "{}output/data_v2-{}/".format(base_dir_path, oneshot_class)
+            directory = "{}output/data_v2_2-{}/".format(base_dir_path, oneshot_class)
             if not os.path.exists(directory):
                 os.makedirs(directory)
             ds.saveToArray(directory)
