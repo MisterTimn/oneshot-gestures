@@ -131,20 +131,19 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         oneshot_class = 19
-        min_val_err = 20
 
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
         for num_oneshot_samples in [100]:
-            for retrain_layers in [3,2,1]:
+            for retrain_layers in [2,1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
                 indices_train[oneshot_class] = indices_train[oneshot_class][:num_oneshot_samples]
                 print(len(indices_train[oneshot_class]))
                 save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
-
+                min_val_err = 20
                 convnet.preload_excluding_model("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
                 q.join()
 
