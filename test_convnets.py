@@ -105,17 +105,17 @@ def main():
             #                   100.0*false_positives[class_index] / total_errors))
 
 
-        with open("{}output/processed/test-results-19".format(base_dir_path),'r+') as out_f:
-            lines = in_f.readlines()
-            out_f.write("{};{}".format(lines[0],num_layers_retrained))
-            out_f.write("{};{}".format(lines[1],num_samples))
-            out_f.write("{};{}".format(lines[2],test_acc / test_batches))
-            for class_index in range(20):
-                out_f.write("{};{}".format(lines[3+class_index],1 - (errors[class_index]/total[class_index])))
-            for class_index in range(20):
-                out_f.write("{};{}".format(lines[23+class_index],1 - (false_positives[class_index]/total_errors)))
+            with open("{}output/processed/test-results-19".format(base_dir_path),'r+') as out_f:
+                lines = out_f.readlines()
+                out_f.write("{};{}".format(lines[0],num_layers_retrained))
+                out_f.write("{};{}".format(lines[1],num_samples))
+                out_f.write("{};{}".format(lines[2],test_acc / test_batches))
+                for class_index in range(20):
+                    out_f.write("{};{}".format(lines[3+class_index],1 - (errors[class_index]/total[class_index])))
+                for class_index in range(20):
+                    out_f.write("{};{}".format(lines[23+class_index],1 - (false_positives[class_index]/total_errors)))
 
-            print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
+                print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
 
 
