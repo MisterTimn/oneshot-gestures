@@ -74,7 +74,7 @@ def main():
             out_f.write("{}".format(class_index))
         for class_index in xrange(20):
             out_f.write("FP {}".format(class_index))
-        print(len(out_f.readlines)
+        print(len(out_f.readlines()))
 
     for num_samples in [200,100,50,25,10,5,2,1]:
         for num_layers_retrained in [3,2,1]:
