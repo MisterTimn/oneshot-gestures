@@ -67,14 +67,13 @@ def main():
     base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
 
     with open("{}output/processed/test-results-19".format(base_dir_path),'w') as out_f:
-        out_f.write("layers")
-        out_f.write("samples")
-        out_f.write("test-acc")
+        out_f.write("layers\n")
+        out_f.write("samples\n")
+        out_f.write("test-acc\n")
         for class_index in xrange(20):
-            out_f.write("{}".format(class_index))
+            out_f.write("{}\n".format(class_index))
         for class_index in xrange(20):
-            out_f.write("FP {}".format(class_index))
-        print(len(out_f.readlines()))
+            out_f.write("FP {}\n".format(class_index))
 
     for num_samples in [200,100,50,25,10,5,2,1]:
         for num_layers_retrained in [3,2,1]:
@@ -107,15 +106,15 @@ def main():
 
 
             with open("{}output/processed/test-results-19".format(base_dir_path),'r+') as out_f:
-                lines = out_f.readlines()
+                lines = out_f.read().splitlines() #split and discard newlines (\n)
                 print(len(lines))
-                out_f.write("{};{}".format(lines[0],num_layers_retrained))
-                out_f.write("{};{}".format(lines[1],num_samples))
-                out_f.write("{};{}".format(lines[2],test_acc / test_batches))
+                out_f.write("{};{}\n".format(lines[0],num_layers_retrained))
+                out_f.write("{};{}\n".format(lines[1],num_samples))
+                out_f.write("{};{}\n".format(lines[2],test_acc / test_batches))
                 for class_index in range(20):
-                    out_f.write("{};{}".format(lines[3+class_index],1 - (errors[class_index]/total[class_index])))
+                    out_f.write("{};{}\n".format(lines[3+class_index],1 - (errors[class_index]/total[class_index])))
                 for class_index in range(20):
-                    out_f.write("{};{}".format(lines[23+class_index],1 - (false_positives[class_index]/total_errors)))
+                    out_f.write("{};{}\n".format(lines[23+class_index],1 - (false_positives[class_index]/total_errors)))
 
             print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
