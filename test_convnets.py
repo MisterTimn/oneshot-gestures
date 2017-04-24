@@ -71,7 +71,7 @@ def main():
         out_f.write("samples")
         out_f.write("test-acc")
         for class_index in xrange(20):
-            out_f.write(class_index)
+            out_f.write("{}".format(class_index))
         for class_index in xrange(20):
             out_f.write("FP {}".format(class_index))
 
