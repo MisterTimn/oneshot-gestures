@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet_oneshot
+import convnet_v2_oneshot as cnn
 import os
 
 false_positives = np.zeros(20, dtype=np.int)
@@ -51,7 +51,7 @@ def filterFalsePredictions(targets, predictions):
             false_positives[predictions[i]] += 1
 
 def main():
-    convnet = convnet_oneshot.convnet_oneshot()
+    convnet = cnn.convnet_oneshot()
     load = load_class.load()
     x_test, labels_test, indices_test = load.load_testing_set()
     # x_test, labels_test, indices_test = load.load_validation_set()
