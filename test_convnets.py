@@ -67,7 +67,7 @@ def main():
 
     base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
 
-    with open("{}output/processed/test-results-19".format(base_dir_path),'w') as out_f:
+    with open("{}output/processed/test-results-19.csv".format(base_dir_path),'w') as out_f:
         out_f.write("layers;samples;test-acc")
         for class_index in xrange(20):
             out_f.write(";{}".format(class_index))
