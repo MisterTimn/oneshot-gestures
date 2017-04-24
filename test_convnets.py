@@ -72,7 +72,7 @@ def main():
         for class_index in xrange(20):
             out_f.write(";{}".format(class_index))
         for class_index in xrange(20):
-            out_f.write(";FP {}".format(class_index))
+            out_f.write(";FP{}".format(class_index))
         out_f.write("\n")
 
     for num_samples in [200,100,50,25,10,5,2,1]:
@@ -109,9 +109,9 @@ def main():
             with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
-                    out_f.write("{};".format(1.0*positives[class_index]/total[class_index]))
+                    out_f.write("{};".format(1.0*positives[class_index]/total[class_index]).replace('.',','))
                 for class_index in range(20):
-                    out_f.write("{};".format(1.0*false_positives[class_index]/total_errors))
+                    out_f.write("{};".format(1.0*false_positives[class_index]/total_errors).replace('.',','))
                 out_f.write("\n")
 
 
