@@ -106,7 +106,7 @@ def main():
             #                   100.0*false_positives[class_index] / total_errors))
 
 
-            with open("{}output/processed/test-results-19".format(base_dir_path),'r') as out_f:
+            with open("{}output/processed/test-results-19".format(base_dir_path),'w') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
                     out_f.write("{};".format(1.0 - (errors[class_index]/total[class_index])))
