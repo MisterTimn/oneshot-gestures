@@ -106,16 +106,17 @@ def main():
 
             print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
-            with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
+            with open("{}output/processed/test-results-19.csv".format(base_dir_path),'ab') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
                     out_f.write("{};".format(1.0*positives[class_index]/total[class_index]).replace('.',','))
                 for class_index in range(20):
                     out_f.write("{};".format(1.0*false_positives[class_index]/total_errors).replace('.',','))
                 out_f.write("\n")
-
-
-
+    with open("{}output/processed/test-results-19.csv".format(base_dir_path), 'ab') as out_f:
+        out_f.write("totals;")
+        for class_index in range(20):
+            out_f.write("{};".format(total[class_index]))
 
 
 if __name__ == "__main__":
