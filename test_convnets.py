@@ -74,6 +74,7 @@ def main():
             out_f.write("{}".format(class_index))
         for class_index in xrange(20):
             out_f.write("FP {}".format(class_index))
+        print(len(out_f.readlines)
 
     for num_samples in [200,100,50,25,10,5,2,1]:
         for num_layers_retrained in [3,2,1]:
@@ -107,6 +108,7 @@ def main():
 
             with open("{}output/processed/test-results-19".format(base_dir_path),'r+') as out_f:
                 lines = out_f.readlines()
+                print(len(lines))
                 out_f.write("{};{}".format(lines[0],num_layers_retrained))
                 out_f.write("{};{}".format(lines[1],num_samples))
                 out_f.write("{};{}".format(lines[2],test_acc / test_batches))
@@ -115,7 +117,7 @@ def main():
                 for class_index in range(20):
                     out_f.write("{};{}".format(lines[23+class_index],1 - (false_positives[class_index]/total_errors)))
 
-                print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
+            print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
 
 
