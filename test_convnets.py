@@ -97,23 +97,23 @@ def main():
                 test_acc += acc
                 test_batches += 1
             print("\nclass-{}-retrain-{}-samples-{}".format(class_num,num_layers_retrained,num_samples))
-            print("class\terror\tfalse pos")
-            for class_index in range(20):
-                print("{:2}:\t{:5.2f}%\t{:5.2f}%"
-                      .format(class_index,
-                              100.0 * positives[class_index] / total[class_index],
-                              100.0 * false_positives[class_index] / total_errors))
+            # print("class\terror\tfalse pos")
+            # for class_index in range(20):
+            #     print("{:2}:\t{:5.2f}%\t{:5.2f}%"
+            #           .format(class_index,
+            #                   100.0 * positives[class_index] / total[class_index],
+            #                   100.0 * false_positives[class_index] / total_errors))
 
+            print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
             with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
-                    out_f.write("{};".format(positives[class_index] / total[class_index]))
+                    out_f.write("{};".format(1.0*positives[class_index]/total[class_index]))
                 for class_index in range(20):
-                    out_f.write("{};".format(false_positives[class_index]/total_errors))
+                    out_f.write("{};".format(1.0*false_positives[class_index]/total_errors))
                 out_f.write("\n")
 
-            print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
 
 
