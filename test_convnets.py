@@ -68,8 +68,6 @@ def main():
 
     with open("{}output/processed/test-results-19".format(base_dir_path),'w') as out_f:
         out_f.write("layers;samples;test-acc")
-        out_f.write("samples\n")
-        out_f.write("test-acc\n")
         for class_index in xrange(20):
             out_f.write(";{}".format(class_index))
         for class_index in xrange(20):
@@ -98,12 +96,12 @@ def main():
                 test_acc += acc
                 test_batches += 1
             print("\nclass-{}-retrain-{}-samples-{}".format(class_num,num_layers_retrained,num_samples))
-            # print("class\terror\tfalse pos")
-            # for class_index in range(20):
-            #     print("{:2}:\t{:5.2f}%\t{:5.2f}%"
-            #           .format(class_index,
-            #                   100.0*errors[class_index] / total[class_index],
-            #                   100.0*false_positives[class_index] / total_errors))
+            print("class\terror\tfalse pos")
+            for class_index in range(20):
+                print("{:2}:\t{:5.2f}%\t{:5.2f}%"
+                      .format(class_index,
+                              100.0*errors[class_index] / total[class_index],
+                              100.0*false_positives[class_index] / total_errors))
 
 
             with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
