@@ -11,7 +11,7 @@ import convnet_v2_oneshot as cnn
 import os
 
 false_positives = np.zeros(20, dtype=np.int)
-errors = np.zeros(20, dtype=np.int)
+positives = np.zeros(20, dtype=np.int)
 total = np.zeros(20, dtype=np.int)
 
 total_errors = 0
@@ -47,8 +47,9 @@ def filterFalsePredictions(targets, predictions):
         total[targets[i]]+=1
         if(targets[i] != predictions[i]):
             total_errors += 1
-            errors[targets[i]] += 1
             false_positives[predictions[i]] += 1
+        else:
+            positives[targets[i]] += 1
 
 def main():
     convnet = cnn.convnet_oneshot()
@@ -59,7 +60,7 @@ def main():
 
 
     class_num = 19
-    global errors
+    global positives
     global total
     global false_positives
     global total_errors
@@ -79,7 +80,7 @@ def main():
         # num_layers_retrained = 3
         # for num_samples in [200,100,50,25,10]:
 
-            errors = np.zeros(20, dtype=np.int)
+            positives = np.zeros(20, dtype=np.int)
             total = np.zeros(20, dtype=np.int)
             false_positives = np.zeros(20, dtype=np.int)
             total_errors=0
@@ -100,16 +101,16 @@ def main():
             for class_index in range(20):
                 print("{:2}:\t{:5.2f}%\t{:5.2f}%"
                       .format(class_index,
-                              100.0*errors[class_index] / total[class_index],
-                              100.0*false_positives[class_index] / total_errors))
+                              100.0 * positives[class_index] / total[class_index],
+                              100.0 * false_positives[class_index] / total_errors))
 
 
             with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
-                    out_f.write("{};".format(-1.0*errors[class_index]/total[class_index])+1)
+                    out_f.write("{};".format(positives[class_index] / total[class_index]))
                 for class_index in range(20):
-                    out_f.write("{};".format(-1.0*false_positives[class_index]/total_errors)+1)
+                    out_f.write("{};".format(false_positives[class_index]/total_errors))
                 out_f.write("\n")
 
             print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
