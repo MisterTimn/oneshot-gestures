@@ -107,9 +107,9 @@ def main():
             with open("{}output/processed/test-results-19".format(base_dir_path),'ab') as out_f:
                 out_f.write("{};{};{};".format(num_layers_retrained,num_samples,test_acc / test_batches))
                 for class_index in range(20):
-                    out_f.write("{};".format((1.0-(errors[class_index]/total[class_index]))))
+                    out_f.write("{};".format(-1.0*errors[class_index]/total[class_index])+1)
                 for class_index in range(20):
-                    out_f.write("{};".format((1.0-(false_positives[class_index]/total_errors))))
+                    out_f.write("{};".format(-1.0*false_positives[class_index]/total_errors)+1)
                 out_f.write("\n")
 
             print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
