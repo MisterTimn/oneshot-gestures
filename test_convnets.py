@@ -66,7 +66,7 @@ def main():
 
     base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
 
-    with open("{}output/processed/test-results-19".format(base_dir_path)) as out_f:
+    with open("{}output/processed/test-results-19".format(base_dir_path),'w') as out_f:
         out_f.write("layers")
         out_f.write("samples")
         out_f.write("test-acc")
@@ -105,7 +105,7 @@ def main():
             #                   100.0*false_positives[class_index] / total_errors))
 
 
-        with open("{}output/processed/test-results-19".format(base_dir_path)) as out_f:
+        with open("{}output/processed/test-results-19".format(base_dir_path),'r+') as out_f:
             lines = in_f.readlines()
             out_f.write("{};{}".format(lines[0],num_layers_retrained))
             out_f.write("{};{}".format(lines[1],num_samples))
