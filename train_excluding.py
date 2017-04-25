@@ -13,11 +13,11 @@ import load_class
 from util.dataprocessing import DataSaver
 
 augmenter = aug.augmenter()
-loader = load_class.load()
-
-samples, labels, indices_train = loader.load_training_set()
-x_validate, labels_validate, indices_validate = loader.load_validation_set()
-x_test, labels_test, indices_test = loader.load_testing_set()
+# loader = load_class.load()
+#
+# samples, labels, indices_train = loader.load_training_set()
+# x_validate, labels_validate, indices_validate = loader.load_validation_set()
+# x_test, labels_test, indices_test = loader.load_testing_set()
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
 
