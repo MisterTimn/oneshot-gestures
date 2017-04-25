@@ -145,8 +145,6 @@ if __name__=='__main__':
 
             convnet = cnn.convnet(num_output_units=19)
             save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
-            if (not os.path.exists(save_param_path)):
-                os.makedirs(save_param_path)
             q.put('oneshot')
             q.put(oneshot_class)
             q.join()
