@@ -31,7 +31,6 @@ class load(object):
         self.labels_original = np.zeros(len(labels_original), dtype='int8')
         print("\rInitializing load_module... (4/4)");sys.stdout.flush()
 
-        print(labels_original[0:100])
         #Change the class labels so that the oneshot class is last
         i = 0
         for label in labels_original:
@@ -42,9 +41,6 @@ class load(object):
             else:
                 self.labels_original[i] = label
             i += 1
-
-        print(len(self.labels_original))
-        print(self.labels_original[0:100])
 
         self.sample_size = int((self.samples.shape[0]))
 

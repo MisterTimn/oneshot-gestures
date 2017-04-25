@@ -41,7 +41,8 @@ def worker_backprop(q):
         if cmd == 'done':
             done = True
         elif cmd == 'batch':
-            classes = np.random.choice(class_choices,batch_size)
+            # classes = np.random.choice(class_choices,batch_size)
+            classes = np.random.randint(num_classes-1, size=batch_size)
             for i in xrange(batch_size):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
@@ -49,9 +50,8 @@ def worker_backprop(q):
         elif cmd == 'oneshot':
             q.task_done()
             class_choices = []
-            oneshot_class = q.get()
             for class_num in xrange(20):
-                if class_num != oneshot_class:
+                if class_num != 19:
                     class_choices.append(class_num)
         q.task_done()
 
@@ -145,9 +145,6 @@ if __name__=='__main__':
 
             convnet = cnn.convnet(num_output_units=19)
             save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
-            q.put('oneshot')
-            q.put(oneshot_class)
-            q.join()
 
             try:
                 backprops_per_epoch = 200
