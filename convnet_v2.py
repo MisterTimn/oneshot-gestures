@@ -11,7 +11,7 @@ import lasagne as nn
 
 class convnet(object):
 
-    def __init__(self, num_output_units=20):
+    def __init__(self, num_output_units=19):
         print "Initializing convnet model"
         # define model: neural network
         input_var = T.tensor4("inputs")
@@ -45,7 +45,7 @@ class convnet(object):
                                             nonlinearity=nn.nonlinearities.rectify	)
 
         self.network = nn.layers.DenseLayer(dense2,
-                                            num_units=num_output_units-1,
+                                            num_units=num_output_units,
                                             nonlinearity=nn.nonlinearities.softmax	)
 
         L1 = 0.

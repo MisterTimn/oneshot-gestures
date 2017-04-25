@@ -45,15 +45,19 @@ class convnet_oneshot(object):
                                             num_units=100,
                                             nonlinearity=nn.nonlinearities.rectify	)
 
+
         self.dense_excluding = nn.layers.DenseLayer(self.dense2,
                                             num_units=num_output_units-1,
                                             nonlinearity=nn.nonlinearities.identity	)
 
+        #w b initialiseren op 0
         self.dense_oneshot = nn.layers.DenseLayer(self.dense2,
                                                   num_units=1,
                                                   nonlinearity=nn.nonlinearities.identity )
 
         self.concat = nn.layers.ConcatLayer((self.dense_excluding,self.dense_oneshot))
+
+#nonlinearity layer
 
         self.network = nn.layers.DenseLayer(self.concat,
                                             num_units=num_output_units,

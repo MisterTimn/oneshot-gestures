@@ -8,12 +8,15 @@ import sys
 
 class load(object):
 
-    def __init__(self, size_ratio=1):
+    def __init__(self, oneshot_class=19):
         print
         print("Initializing load_module... (0/4)",end="")
         sys.stdout.flush()
         #data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
         data_path = "/home/jveessen/"
+
+        self.num_classes = 20
+        self.oneshot_class=oneshot_class
 
         file = h5py.File(data_path+"data_ints.hdf5","r")
         print("\rInitializing load_module... (1/4)", end="");sys.stdout.flush()
@@ -21,13 +24,20 @@ class load(object):
         self.samples = np.asarray(file["samples"], dtype='float32')
         print("\rInitializing load_module... (2/4)", end="");sys.stdout.flush()
 
-        self.labels = file["labels"]
-        print("\rInitializing load_module... (3/4)", end="");sys.stdout.flush()
+        # self.labels = file["labels"]
+        # print("\rInitializing load_module... (3/4)", end="");sys.stdout.flush()
 
         self.labels_original = file["labels_original"]
         print("\rInitializing load_module... (4/4)");sys.stdout.flush()
 
-        self.sample_size = int((self.samples.shape[0])*size_ratio)
+        #Change the class labels so that the oneshot class is last
+        for i in xrange(len(self.labels_original)):
+            if self.labels_original[i] == self.oneshot_class:
+                self.labels_original[i] = num_classes - 1
+            elif self.labels_original[i] > self.oneshot_class:
+                self.labels_original[i] -= 1
+
+        self.sample_size = int((self.samples.shape[0]))
 
     def load_training_set(self):
         print("Loading training set...");sys.stdout.flush()

@@ -15,12 +15,9 @@ from util.dataprocessing import DataSaver
 augmenter = aug.augmenter()
 loader = load_class.load()
 
-
 samples, labels, indices_train = loader.load_training_set()
 x_validate, labels_validate, indices_validate = loader.load_validation_set()
 x_test, labels_test, indices_test = loader.load_testing_set()
-
-class_accuracies = np.zeros(20,dtype=np.int)
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
 
@@ -129,78 +126,85 @@ if __name__=='__main__':
 
         #convnet.load_param_values(save_param_path)
         oneshot_class = 19
-        min_val_err = 20
 
-        ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'class_acc', 'dt'))
-
-        convnet = cnn.convnet(num_output_units=20)
-        save_param_path = "{}convnet_params/paramv_v2-excl{}".format(base_dir_path,oneshot_class)
-        if (not os.path.exists(save_param_path)):
-            os.makedirs(save_param_path)
-        q.put('oneshot')
-        q.put(oneshot_class)
-        q.join()
 
         ###
         # In case there is need to load old params to continue training
         ###
-        convnet.load_param_values(save_param_path)
+        # convnet.load_param_values(save_param_path)
+        for oneshot_class in xrange(20):
+            loader = load_class.load(oneshot_class)
 
-        try:
-            backprops_per_epoch = 200
-            num_backprops = 20000 / backprops_per_epoch
-            for j in xrange(num_backprops):
-                #Initialise new random permutation of data
-                #And load first batch of augmented samples
-                q.put('batch')
-                end_epoch = False
-                train_err = 0
-                train_batches=0
-                start_time = time.time()
-                print("\t--- BACKPROP {} to {} ---".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch))
-                #wait for data
-                q.join()
-                for i in xrange(backprops_per_epoch):
-                    # Data kopieren om daarna te starten met augmentatie volgende batch
-                    np.copyto(sample_batch,sharedSampleArray)
-                    np.copyto(label_batch,sharedLabelArray)
+            samples, labels, indices_train = loader.load_training_set()
+            x_validate, labels_validate, indices_validate = loader.load_validation_set()
+            x_test, labels_test, indices_test = loader.load_testing_set()
 
+            min_val_err = 20
+
+            ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
+
+            convnet = cnn.convnet(num_output_units=19)
+            save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
+            if (not os.path.exists(save_param_path)):
+                os.makedirs(save_param_path)
+            q.put('oneshot')
+            q.put(oneshot_class)
+            q.join()
+
+            try:
+                backprops_per_epoch = 200
+                num_backprops = 3*20000 / backprops_per_epoch
+                for j in xrange(num_backprops):
+                    #Initialise new random permutation of data
+                    #And load first batch of augmented samples
                     q.put('batch')
-
-                    #trainen op de gekopieerde data
-                    train_err += convnet.train(sample_batch, label_batch)
-                    train_batches += 1
-                    print("\rtrain err:\t{:5.2f}".format(train_err / i), end="");sys.stdout.flush()
-                    print("\t{:5.0f}%".format(100.0 * (i+1) / backprops_per_epoch), end="");sys.stdout.flush()
-
+                    end_epoch = False
+                    train_err = 0
+                    train_batches=0
+                    start_time = time.time()
+                    print("\t--- BACKPROP {} to {} ---".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch))
+                    #wait for data
                     q.join()
-                print("test")
-                train_loss = train_err / backprops_per_epoch
-                val_loss, val_acc, class_acc = validate(convnet)
+                    for i in xrange(backprops_per_epoch):
+                        # Data kopieren om daarna te starten met augmentatie volgende batch
+                        np.copyto(sample_batch,sharedSampleArray)
+                        np.copyto(label_batch,sharedLabelArray)
 
-                if (val_loss < min_val_err):
-                    min_val_err = val_loss
-                    convnet.save_param_values(save_param_path)
+                        q.put('batch')
 
-                print("\nval err:\t{:5.2f}\nval acc:\t{:5.2f}%\nclass acc:\t{:5.2f}%"
-                      .format(val_loss,val_acc * 100.0,class_acc * 100.0))
-                ds.saveValues((train_loss,val_loss,val_acc,class_acc,time.time()-start_time))
+                        #trainen op de gekopieerde data
+                        train_err += convnet.train(sample_batch, label_batch)
+                        train_batches += 1
+                        print("\rtrain err:\t{:5.2f}".format(train_err / i), end="");sys.stdout.flush()
+                        print("\t{:5.0f}%".format(100.0 * (i+1) / backprops_per_epoch), end="");sys.stdout.flush()
 
-        except KeyboardInterrupt:
-            print("Iteration stopped through KeyboardInterrupt")
-        except:
-            raise
-        finally:
+                        q.join()
+                    train_loss = train_err / backprops_per_epoch
+                    val_loss, val_acc, class_acc = validate(convnet)
 
-            convnet.load_param_values(save_param_path)
-            test_acc = test(convnet)
-            print("test-acc:{:5.2f}%".format(test_acc * 100))
+                    if (val_loss < min_val_err):
+                        min_val_err = val_loss
+                        convnet.save_param_values(save_param_path)
 
-            directory = "{}output/data_v2_2-{}/".format(base_dir_path, oneshot_class)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            ds.saveToArray(directory)
-            ds.saveToCsv(directory,"acc_loss")
+                    print("\nval err:\t{:5.2f}\nval acc:\t{:5.2f}%"
+                          .format(val_loss,val_acc * 100.0))
+                    ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
+
+            except KeyboardInterrupt:
+                print("Iteration stopped through KeyboardInterrupt")
+            except:
+                raise
+            finally:
+
+                convnet.load_param_values(save_param_path)
+                test_acc = test(convnet)
+                print("test-acc:{:5.2f}%".format(test_acc * 100))
+
+                directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                ds.saveToArray(directory)
+                ds.saveToCsv(directory,"acc_loss")
 
     except:
         raise

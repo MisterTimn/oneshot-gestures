@@ -84,6 +84,7 @@ def main():
             total = np.zeros(20, dtype=np.int)
             false_positives = np.zeros(20, dtype=np.int)
             total_errors=0
+        
             convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
             test_err = 0
