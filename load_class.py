@@ -72,3 +72,6 @@ class load(object):
             class_arrays[label].append(i)
             i+=1
         return class_arrays
+
+    def get_oneshot(self):
+        return self.oneshot_class

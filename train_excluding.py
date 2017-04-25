@@ -43,7 +43,6 @@ def worker_backprop(q):
         elif cmd == 'batch':
             # classes = np.random.choice(class_choices,batch_size)
             classes = np.random.randint(num_classes-1, size=batch_size)
-            print(classes)
             for i in xrange(batch_size):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
@@ -93,7 +92,7 @@ def validate(convnet):
         err, acc = convnet.validate(inputs, targets)
         val_err += err
         val_acc += acc
-        # predict_count, class_count = getClassAccuracy(targets, convnet.test_output(inputs), oneshot_class)
+        predict_count, class_count = getClassAccuracy(targets, convnet.test_output(inputs), oneshot_class)
         if ( class_count != 0 ):
             class_acc += 1.0 * predict_count / class_count
             num_valid_class_acc += 1
@@ -126,14 +125,17 @@ if __name__=='__main__':
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
         for oneshot_class in xrange(20):
+            global loader
             loader = load_class.load(oneshot_class)
+            print(loader.get_oneshot())
+
+            global samples, labels, indices_train
+            global x_validate, labels_validate, indices_validate
+            global x_test, labels_test, indices_test
 
             samples, labels, indices_train = loader.load_training_set()
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
             x_test, labels_test, indices_test = loader.load_testing_set()
-
-
-            print(labels_validate)
 
             min_val_err = 20
 
