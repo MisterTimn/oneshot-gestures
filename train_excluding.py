@@ -20,21 +20,16 @@ augmenter = aug.augmenter()
 # x_test, labels_test, indices_test = loader.load_testing_set()
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
-
-print(base_dir_path)
-
 num_classes = 20
 batch_size = 32
 
-def worker_backprop(q):
+def worker_backprop(q,samples,labels,indices_train):
     #Data voor volgende iteratie ophalen en verwerken
     #Opslaan in shared memory
     done = False
     sharedSampleArray = sa.attach("shm://samples")
     sharedLabelArray = sa.attach("shm://labels")
     indices = np.empty(batch_size,dtype='int32')
-
-    class_choices = []
 
     while not done:
         cmd = q.get()
@@ -55,13 +50,8 @@ def worker_backprop(q):
                     class_choices.append(class_num)
         q.task_done()
 
-def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):
+def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
     assert len(inputs) == len(targets)
-
-    # indices_all=np.arange(len(inputs))
-    # mask = np.ones(len(indices_all), dtype=bool)
-    # mask[class_indices[oneshot_class]] = False
-    # indices = indices_all[mask, ...]
     indices=np.arange(len(inputs))
 
     if shuffle:
@@ -81,13 +71,13 @@ def getClassAccuracy(targets, predictions, class_num):
                 predict_count += 1
     return predict_count, class_count
 
-def validate(convnet):
+def validate(convnet,x_validate,labels_validate):
     val_err = 0
     val_acc = 0
     val_batches = 0
     num_valid_class_acc = 0
     class_acc = 0
-    for batch in iterate_minibatches(x_validate, labels_validate, batch_size, indices_validate, True):
+    for batch in iterate_minibatches(x_validate, labels_validate, batch_size, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         val_err += err
@@ -99,11 +89,11 @@ def validate(convnet):
         val_batches += 1
     return val_err/val_batches, val_acc/val_batches, class_acc/num_valid_class_acc
 
-def test(convnet):
+def test(convnet,x_test,labels_test):
     test_err = 0
     test_acc = 0
     test_batches = 0
-    for batch in iterate_minibatches(x_test, labels_test, batch_size, indices_test, shuffle=False):
+    for batch in iterate_minibatches(x_test, labels_test, batch_size, shuffle=False):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         test_err += err
@@ -116,10 +106,7 @@ if __name__=='__main__':
         sharedSampleArray = sa.create("shm://samples", (batch_size, 12, 64, 64), dtype='float32')
         sharedLabelArray = sa.create("shm://labels", batch_size, dtype='int32')
 
-        q = mp.JoinableQueue()
-        proc = mp.Process(target=worker_backprop, args=[q])
-        proc.daemon = True
-        proc.start()
+
 
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
@@ -146,6 +133,11 @@ if __name__=='__main__':
             save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
 
             try:
+                q = mp.JoinableQueue()
+                proc = mp.Process(target=worker_backprop, args=[q, samples, labels, indices_train])
+                proc.daemon = True
+                proc.start()
+
                 backprops_per_epoch = 200
                 num_backprops = 3*20000 / backprops_per_epoch
                 for j in xrange(num_backprops):
@@ -174,7 +166,7 @@ if __name__=='__main__':
 
                         q.join()
                     train_loss = train_err / backprops_per_epoch
-                    val_loss, val_acc, class_acc = validate(convnet)
+                    val_loss, val_acc, class_acc = validate(convnet,x_validate,labels_validate)
 
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
@@ -189,9 +181,9 @@ if __name__=='__main__':
             except:
                 raise
             finally:
-
+                q.put('done')
                 convnet.load_param_values(save_param_path)
-                test_acc = test(convnet)
+                test_acc = test(convnet,x_test,labels_test)
                 print("test-acc:{:5.2f}%".format(test_acc * 100))
 
                 directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
@@ -203,7 +195,6 @@ if __name__=='__main__':
     except:
         raise
     finally:
-        q.put('done')
         sa.delete("samples")
         sa.delete("labels")
     print("End of program")
