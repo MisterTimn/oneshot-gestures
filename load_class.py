@@ -28,7 +28,7 @@ class load(object):
         # print("\rInitializing load_module... (3/4)", end="");sys.stdout.flush()
 
         labels_original = file["labels_original"]
-        self.labels_original = np.zeros(len(labels_original))
+        self.labels_original = np.zeros(len(labels_original), dtype='int8')
         print("\rInitializing load_module... (4/4)");sys.stdout.flush()
 
         #Change the class labels so that the oneshot class is last
