@@ -33,7 +33,7 @@ class load(object):
         #Change the class labels so that the oneshot class is last
         for i in xrange(len(self.labels_original)):
             if self.labels_original[i] == self.oneshot_class:
-                self.labels_original[i] = num_classes - 1
+                self.labels_original[i] = self.num_classes - 1
             elif self.labels_original[i] > self.oneshot_class:
                 self.labels_original[i] -= 1
 
