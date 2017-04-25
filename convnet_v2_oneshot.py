@@ -53,15 +53,17 @@ class convnet_oneshot(object):
         #w b initialiseren op 0
         self.dense_oneshot = nn.layers.DenseLayer(self.dense2,
                                                   num_units=1,
+                                                  W=nn.init.Constant(0.0),
+                                                  b=nn.init.Constant(0.0),
                                                   nonlinearity=nn.nonlinearities.identity )
 
         self.concat = nn.layers.ConcatLayer((self.dense_excluding,self.dense_oneshot))
 
 #nonlinearity layer
 
-        self.network = nn.layers.DenseLayer(self.concat,
-                                            num_units=num_output_units,
-                                            nonlinearity=nn.nonlinearities.softmax )
+        self.network = nn.layers.NonlinearityLayer( self.concat,
+                                                    num_units=num_output_units,
+                                                    nonlinearity=nn.nonlinearities.softmax )
 
 
         L1 = 0.
@@ -131,6 +133,7 @@ class convnet_oneshot(object):
         with open(path, 'rb') as f:
             param_values = pickle.load(f)
         nn.layers.set_all_param_values(self.dense_excluding,param_values)
+        self.dense_excluding
 
     def save_param_values(self, path):
         param_values = nn.layers.get_all_param_values(self.network)

@@ -187,8 +187,8 @@ if __name__=='__main__':
                 print("test-acc:{:5.2f}%".format(test_acc * 100))
 
                 directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
-                # if not os.path.exists(directory):
-                #     os.makedirs(directory)
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
                 ds.saveToArray(directory)
                 ds.saveToCsv(directory,"acc_loss")
 
