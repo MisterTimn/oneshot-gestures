@@ -124,14 +124,15 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
+        global loader
+        global samples, labels, indices_train
+        global x_validate, labels_validate, indices_validate
+        global x_test, labels_test, indices_test
+
         for oneshot_class in xrange(20):
-            global loader
+
             loader = load_class.load(oneshot_class)
             print(loader.get_oneshot())
-
-            global samples, labels, indices_train
-            global x_validate, labels_validate, indices_validate
-            global x_test, labels_test, indices_test
 
             samples, labels, indices_train = loader.load_training_set()
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
