@@ -27,15 +27,20 @@ class load(object):
         # self.labels = file["labels"]
         # print("\rInitializing load_module... (3/4)", end="");sys.stdout.flush()
 
-        self.labels_original = file["labels_original"]
+        labels_original = file["labels_original"]
+        self.labels_original = np.zeros(len(labels_original))
         print("\rInitializing load_module... (4/4)");sys.stdout.flush()
 
         #Change the class labels so that the oneshot class is last
-        for i in xrange(len(self.labels_original)):
-            if self.labels_original[i] == self.oneshot_class:
+        i = 0
+        for label in labels_original:
+            if label == self.oneshot_class:
                 self.labels_original[i] = self.num_classes - 1
-            elif self.labels_original[i] > self.oneshot_class:
-                self.labels_original[i] -= 1
+            elif label > self.oneshot_class:
+                self.labels_original[i] = label - 1
+            else:
+                self.labels_original[i] = label
+            i += 1
 
         self.sample_size = int((self.samples.shape[0]))
 
