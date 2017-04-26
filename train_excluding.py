@@ -186,9 +186,10 @@ if __name__=='__main__':
                 raise
             finally:
                 q.put('done')
-                convnet.load_param_values(save_param_path)
-                test_acc = test(convnet,x_test,labels_test)
-                print("test-acc:{:5.2f}%".format(test_acc * 100))
+                if os.path.exists(save_param_path):
+                    convnet.load_param_values(save_param_path)
+                    test_acc = test(convnet,x_test,labels_test)
+                    print("test-acc:{:5.2f}%".format(test_acc * 100))
 
                 directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
                 if not os.path.exists(directory):
