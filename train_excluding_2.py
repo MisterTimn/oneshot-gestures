@@ -14,8 +14,6 @@ from util.dataprocessing import DataSaver
 
 augmenter = aug.augmenter()
 
-sa.delete("samples2")
-sa.delete("labels2")
 
 # loader = load_class.load()
 #
