@@ -116,7 +116,7 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for oneshot_class in xrange(1,20):
+        for oneshot_class in xrange(15,20):
 
             loader = load_class.load(oneshot_class)
             print(loader.get_oneshot())
