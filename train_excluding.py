@@ -124,7 +124,10 @@ if __name__=='__main__':
 
             samples, labels, indices_train = loader.load_training_set()
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
+            labels_validate = labels_validate[np.in1d(range(len(labels_validate)),indices_validate[oneshot_class])]
             x_test, labels_test, indices_test = loader.load_testing_set()
+            labels_test = labels_test[np.in1d(range(len(labels_test)),indices_test[oneshot_class])]
+
 
             min_val_err = 20
 
