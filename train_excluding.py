@@ -15,6 +15,8 @@ from util.dataprocessing import DataSaver
 augmenter = aug.augmenter()
 
 class_low, class_high = sys.argv[1:2]
+print(class_low)
+print(class_high)
 # loader = load_class.load()
 #
 # samples, labels, indices_train = loader.load_training_set()
