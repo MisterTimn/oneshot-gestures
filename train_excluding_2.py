@@ -9,7 +9,7 @@ import os
 
 import augmentation as aug
 import convnet_v2 as cnn
-import load_class
+import load_class_2 as load_class
 from util.dataprocessing import DataSaver
 
 augmenter = aug.augmenter()
@@ -77,19 +77,13 @@ def validate(convnet,x_validate,labels_validate):
     val_err = 0
     val_acc = 0
     val_batches = 0
-    num_valid_class_acc = 0
-    class_acc = 0
     for batch in iterate_minibatches(x_validate, labels_validate, batch_size, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         val_err += err
         val_acc += acc
-        predict_count, class_count = getClassAccuracy(targets, convnet.test_output(inputs), oneshot_class)
-        if ( class_count != 0 ):
-            class_acc += 1.0 * predict_count / class_count
-            num_valid_class_acc += 1
         val_batches += 1
-    return val_err/val_batches, val_acc/val_batches, class_acc/num_valid_class_acc
+    return val_err/val_batches, val_acc/val_batches
 
 def test(convnet,x_test,labels_test):
     test_err = 0
@@ -168,7 +162,7 @@ if __name__=='__main__':
 
                         q.join()
                     train_loss = train_err / backprops_per_epoch
-                    val_loss, val_acc, class_acc = validate(convnet,x_validate,labels_validate)
+                    val_loss, val_acc = validate(convnet,x_validate,labels_validate)
 
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
