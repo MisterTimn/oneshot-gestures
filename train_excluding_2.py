@@ -127,7 +127,7 @@ if __name__=='__main__':
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
             x_test, labels_test, indices_test = loader.load_testing_set()
 
-            min_val_err = 20
+            min_val_err = 200
 
             ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
