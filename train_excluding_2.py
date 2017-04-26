@@ -196,6 +196,6 @@ if __name__=='__main__':
     except:
         raise
     finally:
-        sa.delete("samples")
-        sa.delete("labels")
+        sa.delete("samples2")
+        sa.delete("labels2")
     print("End of program")
