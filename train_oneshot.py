@@ -14,7 +14,7 @@ import load_class
 from util.dataprocessing import DataSaver
 
 augmenter = aug.augmenter()
-loader = load_class.load()
+loader = load_class.load(15)
 
 
 samples, labels, indices_train = loader.load_training_set()
@@ -24,7 +24,7 @@ x_test, labels_test, indices_test = loader.load_testing_set()
 class_accuracies = np.zeros(20,dtype=np.int)
 
 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
-# convnet = cnn.convnet(num_output_units=20)
+
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
 
@@ -39,26 +39,16 @@ def worker_backprop(q):
     sharedLabelArray = sa.attach("shm://labels")
     indices = np.empty(batch_size,dtype='int32')
 
-    class_choices = []
-
     while not done:
         cmd = q.get()
         if cmd == 'done':
             done = True
         elif cmd == 'batch':
             classes = np.random.randint(num_classes,size=batch_size)
-            #classes = np.random.choice(class_choices,batch_size)
             for i in xrange(batch_size):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
-        elif cmd == 'oneshot':
-            q.task_done()
-            class_choices = []
-            oneshot_class = q.get()
-            for class_num in xrange(20):
-                if class_num != oneshot_class:
-                    class_choices.append(class_num)
         q.task_done()
 
 def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):

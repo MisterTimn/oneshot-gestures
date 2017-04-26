@@ -86,12 +86,12 @@ class convnet_oneshot(object):
 
         params = self.network.get_params(trainable=True)
         params.extend(self.concat.get_params(trainable=True))
-        params.extend(self.dense_excluding.get_params(trainable=True))
+        # params.extend(self.dense_excluding.get_params(trainable=True))
         params.extend(self.dense_oneshot.get_params(trainable=True))
-        if(num_layers_retrain>=2):
-            params.extend(self.dense2.get_params(trainable=True))
-        if(num_layers_retrain>=3):
-            params.extend(self.dense1.get_params(trainable=True))
+        # if(num_layers_retrain>=2):
+        #     params.extend(self.dense2.get_params(trainable=True))
+        # if(num_layers_retrain>=3):
+        #     params.extend(self.dense1.get_params(trainable=True))
 
         updates = nn.updates.nesterov_momentum(	loss, params,
                                                 learning_rate=0.0001,
