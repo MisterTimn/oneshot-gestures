@@ -28,8 +28,8 @@ def worker_backprop(q,samples,labels,indices_train):
     #Data voor volgende iteratie ophalen en verwerken
     #Opslaan in shared memory
     done = False
-    sharedSampleArray = sa.attach("shm://samples")
-    sharedLabelArray = sa.attach("shm://labels")
+    sharedSampleArray = sa.attach("shm://samples2")
+    sharedLabelArray = sa.attach("shm://labels2")
     indices = np.empty(batch_size,dtype='int32')
 
     while not done:
@@ -104,8 +104,8 @@ def test(convnet,x_test,labels_test):
 
 if __name__=='__main__':
     try:
-        sharedSampleArray = sa.create("shm://samples", (batch_size, 12, 64, 64), dtype='float32')
-        sharedLabelArray = sa.create("shm://labels", batch_size, dtype='int32')
+        sharedSampleArray = sa.create("shm://samples2", (batch_size, 12, 64, 64), dtype='float32')
+        sharedLabelArray = sa.create("shm://labels2", batch_size, dtype='int32')
 
 
 
