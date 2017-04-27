@@ -62,7 +62,6 @@ class convnet_oneshot(object):
 #nonlinearity layer
 
         self.network = nn.layers.NonlinearityLayer( self.concat,
-                                                    num_units=num_output_units,
                                                     nonlinearity=nn.nonlinearities.softmax )
 
 

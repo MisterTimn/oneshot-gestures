@@ -46,6 +46,7 @@ class convnet_oneshot(object):
                                             nonlinearity=nn.nonlinearities.rectify	)
 
         self.network = nn.layers.DenseLayer(self.dense2,
+                                            num_units=num_output_units,
                                             nonlinearity=nn.nonlinearities.softmax	)
 
         L1 = 0.
