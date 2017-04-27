@@ -19,7 +19,7 @@ augmenter = aug.augmenter()
 loader = load_class.load(15)
 
 
-samples, labels, indices_train = loader.load_training_set()
+samples, labels, indices_train_all = loader.load_training_set()
 x_validate, labels_validate, indices_validate = loader.load_validation_set()
 x_test, labels_test, indices_test = loader.load_testing_set()
 
@@ -132,14 +132,14 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2,5,10,25]:
+        for num_oneshot_samples in [1,2,5,25]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'class_acc', 'dt'))
 
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
 
-                indices_train[num_classes-1] = indices_train[num_classes-1][:num_oneshot_samples]
+                indices_train[num_classes-1] = indices_train_all[num_classes-1][:num_oneshot_samples]
                 print(len(indices_train[num_classes-1]))
 
                 save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
