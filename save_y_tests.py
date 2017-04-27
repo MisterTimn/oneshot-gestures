@@ -81,7 +81,7 @@ def main():
 
             np.save("{}/output/y_tests/{}-samples{}".format(base_dir_path,class_num,num_samples),y_tests)
 
-
+    np.save("{}/output/y_tests/y_test".format(base_dir_path),labels_test)
 
 
 if __name__ == "__main__":
