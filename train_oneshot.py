@@ -15,6 +15,9 @@ import load_class
 from util.dataprocessing import DataSaver
 from sklearn import metrics
 
+
+num_classes = 20
+batch_size = 32
 augmenter = aug.augmenter()
 loader = load_class.load(15)
 
@@ -30,9 +33,6 @@ class_accuracies = np.zeros(20,dtype=np.int)
 
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
-
-num_classes = 20
-batch_size = 32
 
 def worker_backprop(q):
     #Data voor volgende iteratie ophalen en verwerken

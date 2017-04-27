@@ -132,7 +132,6 @@ class convnet_oneshot(object):
         with open(path, 'rb') as f:
             param_values = pickle.load(f)
         nn.layers.set_all_param_values(self.dense_excluding,param_values)
-
     def save_param_values(self, path):
         param_values = nn.layers.get_all_param_values(self.network)
         with open(path, 'wb') as f:
