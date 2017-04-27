@@ -74,7 +74,7 @@ def main():
             print("\nclass-{}-retrain-{}-samples-{}".format(class_num,num_layers_retrained,num_samples))
             print("TEST-ACC:{:7.3f}%".format(test_acc / test_batches * 100))
 
-            if not os.exists("{}/output/y_tests/".format(base_dir_path)):
+            if not os.path.exists("{}/output/y_tests/".format(base_dir_path)):
                 os.makedirs("{}/output/y_tests/".format(base_dir_path))
 
             y_tests = convnet.test_output(labels_test)
