@@ -138,11 +138,13 @@ if __name__=='__main__':
 
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                indices_train[oneshot_class] = indices_train[oneshot_class][:num_oneshot_samples]
+
+                indices_train[num_classes-1] = indices_train[num_classes-1][:num_oneshot_samples]
                 print(len(indices_train[oneshot_class]))
+
                 save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 min_val_err = 20
-                convnet.preload_excluding_model("{}convnet_params/param-excl{}".format(base_dir_path,oneshot_class))
+                convnet.preload_excluding_model("{}convnet_params/excluding-{}".format(base_dir_path,oneshot_class))
                 q.join()
 
                 ###
