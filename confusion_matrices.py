@@ -13,13 +13,18 @@ dp = util.dataprocessing.DataPlotter()
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
 
-class_num = 15
-load = load_class.load(15)
+class_num = 19
+load = load_class.load(19)
 
 x_test, labels_test, indices_test = load.load_testing_set()
 
-for num_samples in (25,5,2,1):
+# for num_samples in (25,5,2,1):
+#
+#     y_pred = np.load("{}output/y_tests/{}-samples{}.npy".format(base_dir_path,class_num,num_samples))
+#
+#     dp.plotConfusionMatrix(labels_test,y_pred)
 
-    y_pred = np.load("{}output/y_tests/{}-samples{}.npy".format(base_dir_path,class_num,num_samples))
-
-    dp.plotConfusionMatrix(labels_test,y_pred)
+y_pred = np.load("{}output/y_tests/all.npy".format(base_dir_path))
+# labels_test = np.load("{}output/y_tests/y_test.npy".format(base_dir_path))
+#
+dp.plotConfusionMatrix(labels_test,y_pred)

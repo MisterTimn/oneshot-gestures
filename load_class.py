@@ -12,8 +12,8 @@ class load(object):
         print
         print("Initializing load_module... (0/4)",end="")
         sys.stdout.flush()
-        # data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
-        data_path = "/home/jveessen/"
+        data_path = "/home/jasper/oneshot-gestures/data-chalearn/"
+        # data_path = "/home/jveessen/"
 
         self.num_classes = 20
         self.oneshot_class=oneshot_class
