@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet_v2_oneshot as cnn
+import convnet as cnn
 import os
 from util.dataprocessing import DataPlotter as dp
 
@@ -42,7 +42,7 @@ def getParamExcludingPath(class_num):
 
 def main():
 
-    load = load_class.load(15)
+    load = load_class.load(19)
     x_test, labels_test, indices_test = load.load_testing_set()
 
     class_num = 15
@@ -54,11 +54,12 @@ def main():
     base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
 
     y_tests = np.zeros(len(labels_test))
-    for num_samples in [25,5,2,1]:
+    for num_samples in [1]:
         for num_layers_retrained in [1]:
-            convnet = cnn.convnet_oneshot()
-            convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
+            convnet = cnn.convnet()
+            # convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
+            convnet.load_param_values("{}convnet_params/param_allclasses".format(base_dir_path))
 
             test_err = 0
             test_acc = 0
@@ -79,9 +80,9 @@ def main():
 
             y_tests = convnet.test_output(x_test)
 
-            np.save("{}/output/y_tests/{}-samples{}".format(base_dir_path,class_num,num_samples),y_tests)
-
-    np.save("{}/output/y_tests/y_test".format(base_dir_path),labels_test)
+            # np.save("{}/output/y_tests/{}-samples{}".format(base_dir_path,class_num,num_samples),y_tests)
+            np.save("{}/output/y_tests/all".format(base_dir_path),y_tests)
+    # np.save("{}/output/y_tests/y_test".format(base_dir_path),labels_test)
 
 
 if __name__ == "__main__":
