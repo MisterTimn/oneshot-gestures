@@ -77,7 +77,7 @@ def main():
             if not os.path.exists("{}/output/y_tests/".format(base_dir_path)):
                 os.makedirs("{}/output/y_tests/".format(base_dir_path))
 
-            y_tests = convnet.test_output(labels_test)
+            y_tests = convnet.test_output(x_test)
 
             np.save("{}/output/y_tests/{}".format(base_dir_path,class_num),y_tests)
 
