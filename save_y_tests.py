@@ -59,7 +59,7 @@ def main():
             convnet = cnn.convnet()
             # convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
-            convnet.load_param_values("{}convnet_params/param_allclasses".format(base_dir_path))
+            convnet.load_param_values("{}convnet_params/param-allclasses".format(base_dir_path))
 
             test_err = 0
             test_acc = 0
