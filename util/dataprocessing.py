@@ -91,7 +91,7 @@ class DataPlotter:
 
         plt.show()
 
-    def plot_confusion_matrix(cm, classes,
+    def plot_confusion_matrix(self,cm, classes,
                               normalize=False,
                               title='Confusion matrix',
                               cmap=plt.cm.Blues):
@@ -125,9 +125,10 @@ class DataPlotter:
         plt.xlabel('Predicted label')
 
     def plotConfusionMatrix(self, y_test, y_pred):
-        class_names = ("0")
+        class_names = ["0"]
         for i in xrange(1,20):
             class_names.append("{}".format(i))
+        print(class_names)
 
         cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
         np.set_printoptions(precision=2)
@@ -135,12 +136,8 @@ class DataPlotter:
         # Plot non-normalized confusion matrix
         plt.figure()
         self.plot_confusion_matrix(cnf_matrix, classes=class_names,
-                              title='Confusion matrix, without normalization')
+                              title='Confusion matrix')
 
-        # Plot normalized confusion matrix
-        plt.figure()
-        self.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-                              title='Normalized confusion matrix')
         plt.show()
 
 
