@@ -127,7 +127,7 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
-        oneshot_class = 19
+        oneshot_class = 15
 
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
@@ -140,7 +140,7 @@ if __name__=='__main__':
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
 
                 indices_train[num_classes-1] = indices_train[num_classes-1][:num_oneshot_samples]
-                print(len(indices_train[oneshot_class]))
+                print(len(indices_train[num_classes-1]))
 
                 save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 min_val_err = 20
