@@ -117,16 +117,16 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for oneshot_class in xrange(8,14):
+        for oneshot_class in xrange(9,14):
 
             loader = load_class.load(oneshot_class)
             print(loader.get_oneshot())
 
             samples, labels, indices_train = loader.load_training_set()
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
-            labels_validate = labels_validate[np.in1d(range(len(labels_validate)),indices_validate[oneshot_class])]
+            #labels_validate = labels_validate[np.in1d(range(len(labels_validate)),indices_validate[oneshot_class])]
             x_test, labels_test, indices_test = loader.load_testing_set()
-            labels_test = labels_test[np.in1d(range(len(labels_test)),indices_test[oneshot_class])]
+            #labels_test = labels_test[np.in1d(range(len(labels_test)),indices_test[oneshot_class])]
 
 
             min_val_err = 20
@@ -186,9 +186,10 @@ if __name__=='__main__':
                 raise
             finally:
                 q.put('done')
-                convnet.load_param_values(save_param_path)
-                test_acc = test(convnet,x_test,labels_test)
-                print("test-acc:{:5.2f}%".format(test_acc * 100))
+                if os.path.exists(save_param_path):
+                    convnet.load_param_values(save_param_path)
+                    test_acc = test(convnet,x_test,labels_test)
+                    print("test-acc:{:5.2f}%".format(test_acc * 100))
 
                 directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
                 if not os.path.exists(directory):
