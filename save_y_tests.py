@@ -54,10 +54,10 @@ def main():
     base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
 
     y_tests = np.zeros(len(labels_test))
-    for num_samples in [25,5,2,1]:
+    for num_samples in [1]:
         for num_layers_retrained in [1]:
 
-            convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
+            # convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
 
             test_err = 0
