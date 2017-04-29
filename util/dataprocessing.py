@@ -138,6 +138,11 @@ class DataPlotter:
         self.plot_confusion_matrix(cnf_matrix, classes=class_names,
                               title='Confusion matrix')
 
+        # Plot normalized confusion matrix
+        plt.figure()
+        self.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+                              title='Normalized confusion matrix')
+
         plt.show()
 
 

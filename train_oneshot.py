@@ -133,7 +133,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2,5,25]:
+        for num_oneshot_samples in [1,2,5,25,100]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'class_acc', 'dt'))
 
@@ -143,9 +143,9 @@ if __name__=='__main__':
                 indices_train[num_classes-1] = indices_train_oneshotclass[:num_oneshot_samples]
                 print(len(indices_train[num_classes-1]))
 
-                save_param_path = "{}convnet_params/param-oneshot{}-layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
+                save_param_path = "{}convnet_params/model-19x1/class-{}/layers{}-samples{}/".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 min_val_err = 20
-                convnet.preload_excluding_model("{}convnet_params/excluding-{}".format(base_dir_path,oneshot_class))
+                convnet.preload_excluding_model("{}convnet_params/model-19/excluding-{}".format(base_dir_path,oneshot_class))
                 q.join()
 
                 ###
@@ -209,7 +209,7 @@ if __name__=='__main__':
                         print(precision_score)
                         print(recall_score)
 
-                    directory = "{}output/datav2-{}-retrain-{}-samples-{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
+                    directory = "{}output/model-19x1/class-{}/layers{}-samples{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
                     if not os.path.exists(directory):
                         os.makedirs(directory)
                     ds.saveToArray(directory)
