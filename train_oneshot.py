@@ -143,7 +143,7 @@ if __name__=='__main__':
                 indices_train[num_classes-1] = indices_train_oneshotclass[:num_oneshot_samples]
                 print(len(indices_train[num_classes-1]))
 
-                save_param_path = "{}convnet_params/model-19x1/class-{}/layers{}-samples{}/".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
+                save_param_path = "{}convnet_params/model-19x1/class-{}/layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 min_val_err = 20
                 convnet.preload_excluding_model("{}convnet_params/model-19/excluding-{}".format(base_dir_path,oneshot_class))
                 q.join()
