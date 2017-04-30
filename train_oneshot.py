@@ -133,7 +133,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2,5,25,100]:
+        for num_oneshot_samples in [25,100]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'class_acc', 'dt'))
 
