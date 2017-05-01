@@ -136,8 +136,7 @@ if __name__=='__main__':
                         train_err = 0
                         train_batches=0
                         start_time = time.time()
-                        print("BACKPROP\t{:5.0f}-{:5.0f}:".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch));sys.stdout.flush()
-                        #wait for dat
+
                         q.join()
                         for i in xrange(backprops_per_epoch):
                             # Data kopieren om daarna te starten met augmentatie volgende batch
