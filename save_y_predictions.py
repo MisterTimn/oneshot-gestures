@@ -78,7 +78,7 @@ def main():
             directory = "{}output/model-19x1/class-{}/layers{}-samples{}".format(base_dir_path, class_num,
                                                                                   num_layers_retrained, num_samples)
 
-            with open("{}/test-acc.txt",'ab') as f:
+            with open("{}/test-acc.txt".format(directory),'ab') as f:
                 f.write("layers{};samples{};{}".format(num_layers_retrained,num_samples,1.0*test_acc/test_batches))
             if not os.path.exists(directory):
                 os.makedirs(directory)
