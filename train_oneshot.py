@@ -164,11 +164,11 @@ if __name__=='__main__':
                             min_val_acc = val_acc
                             convnet.save_param_values(save_param_path)
 
-                        print("BACKPROP\t{:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
-                                                                    j * backprops_per_epoch + backprops_per_epoch));
+                        print("\rBP {:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
+                                                                    j * backprops_per_epoch + backprops_per_epoch),end="");
                         sys.stdout.flush()
 
-                        print("--Results: val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
+                        print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                               .format(val_acc * 100.0,precision_score[num_classes-1] * 100.0,recall_score[num_classes-1] * 100.0))
                         ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
