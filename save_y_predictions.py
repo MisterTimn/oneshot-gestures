@@ -42,7 +42,7 @@ def getParamExcludingPath(class_num):
 
 def main():
 
-    load = load_class.load(19)
+    load = load_class.load(15)
     x_test, labels_test, indices_test = load.load_testing_set()
 
     class_num = 15

@@ -129,7 +129,7 @@ if __name__=='__main__':
         # num_oneshot_samples = 2
         for num_oneshot_samples in [25,100]:
             for retrain_layers in [1]:
-                ds = DataSaver(('train_loss', 'val_loss', 'class_acc', 'dt'))
+                ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
