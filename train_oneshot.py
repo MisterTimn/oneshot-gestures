@@ -41,6 +41,10 @@ def worker_backprop(q):
     sharedLabelArray = sa.attach("shm://labels")
     indices = np.empty(batch_size,dtype='int32')
 
+    indices_train[num_classes - 1] = indices_train_oneshotclass[:samples]
+
+    print(len(indices_train[num_classes-1]))
+
     while not done:
         cmd = q.get()
         if cmd == 'done':
@@ -51,6 +55,11 @@ def worker_backprop(q):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
+        elif cmd == 'change_num_samples':
+            q.task_done()
+            indices_train[num_classes - 1] = indices_train_oneshotclass[:int(q.get())]
+            print(len(indices_train[num_classes - 1]))
+
         q.task_done()
 
 def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):
@@ -103,7 +112,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2]:
+        for num_oneshot_samples in [1,2,5,25]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
@@ -112,6 +121,10 @@ if __name__=='__main__':
 
                 indices_train[num_classes-1] = indices_train_oneshotclass[:num_oneshot_samples]
                 print(len(indices_train[num_classes-1]))
+
+                q.put('change_num_samples')
+                q.join()
+                q.put(num_oneshot_samples)
 
                 save_param_path = "{}convnet_params/model-19x1/class-{}/layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
                 min_val_acc = 0
@@ -199,7 +212,7 @@ if __name__=='__main__':
                     if not os.path.exists("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class)):
                         open("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class),'w').close()
                     with open("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class), 'ab') as f:
-                        f.write("layers{};samples{};{}".format(retrain_layers, num_classes, 1.0 * test_acc))
+                        f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
 
 
 

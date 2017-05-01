@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import os
 import itertools
@@ -66,6 +67,9 @@ class DataSaver:
 class DataPlotter:
     def __init__(self):
         print
+        mpl.rcParams['pgf.rcfonts']=False
+        # mpl.rcParams['pgf.texsystem'] = u'xelatex',  # change this if using xetex or lautex
+
 
     def plotAccLoss(self,loss,acc):
         plt.figure(1)
@@ -109,22 +113,28 @@ class DataPlotter:
         if normalize:
             cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
             print("Normalized confusion matrix")
+            thresh = cm.max() / 2.
+            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+                plt.text(j, i, "{:2.0f}".format(cm[i, j]*100.0),
+                         horizontalalignment="center",
+                         color="white" if cm[i, j] > thresh else "black")
         else:
             print('Confusion matrix, without normalization')
+            thresh = cm.max() / 2.
+            for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+                plt.text(j, i, cm[i, j],
+                         horizontalalignment="center",
+                         color="white" if cm[i, j] > thresh else "black")
 
         print(cm)
 
-        thresh = cm.max() / 2.
-        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-            plt.text(j, i, cm[i, j],
-                     horizontalalignment="center",
-                     color="white" if cm[i, j] > thresh else "black")
 
-        plt.tight_layout()
+
+        # plt.tight_layout()
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
 
-    def plotConfusionMatrix(self, y_test, y_pred):
+    def plotConfusionMatrix(self, y_test, y_pred, savePath=None):
         class_names = ["0"]
         for i in xrange(1,20):
             class_names.append("{}".format(i))
@@ -133,15 +143,22 @@ class DataPlotter:
         cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
         np.set_printoptions(precision=2)
 
+
         # Plot non-normalized confusion matrix
-        plt.figure()
+        plt.figure(figsize=(8,6))
         self.plot_confusion_matrix(cnf_matrix, classes=class_names,
                               title='Confusion matrix')
+        if savePath != None:
+            # plt.savefig("{}.pgf".format(savePath))
+            plt.savefig("{}.pdf".format(savePath))
 
         # Plot normalized confusion matrix
-        plt.figure()
+        plt.figure(figsize=(8,6))
         self.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
                               title='Normalized confusion matrix')
+        if savePath != None:
+            # plt.savefig("{}-norm.pgf".format(savePath))
+            plt.savefig("{}-norm.pdf".format(savePath))
 
         plt.show()
 
