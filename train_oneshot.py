@@ -148,7 +148,7 @@ if __name__=='__main__':
                             #trainen op de gekopieerde data
                             train_err += convnet.train(sample_batch, label_batch)
                             train_batches += 1
-                            print("\rBP {:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * backprops_per_epoch + 1,
+                            print("\r{:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * backprops_per_epoch + 1,
                                                                         j * backprops_per_epoch + backprops_per_epoch,
                                                                         100.0 * (i + 1) / backprops_per_epoch),end="");
                             sys.stdout.flush()
@@ -164,7 +164,7 @@ if __name__=='__main__':
                             min_val_acc = val_acc
                             convnet.save_param_values(save_param_path)
 
-                        print("\rBP {:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
+                        print("\r{:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
                                                                     j * backprops_per_epoch + backprops_per_epoch),end="");
                         sys.stdout.flush()
 
