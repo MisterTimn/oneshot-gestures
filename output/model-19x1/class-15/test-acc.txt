@@ -1,2 +1,3 @@
 layers1;samples1;0.80343548
 
+layers1;samples20;0.803931451613
