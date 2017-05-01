@@ -148,7 +148,7 @@ if __name__=='__main__':
                             #trainen op de gekopieerde data
                             train_err += convnet.train(sample_batch, label_batch)
                             train_batches += 1
-                            print("\rBACKPROP\t{:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * backprops_per_epoch + 1,
+                            print("\rBP {:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * backprops_per_epoch + 1,
                                                                         j * backprops_per_epoch + backprops_per_epoch,
                                                                         100.0 * (i + 1) / backprops_per_epoch),end="");
                             sys.stdout.flush()
@@ -168,7 +168,7 @@ if __name__=='__main__':
                                                                     j * backprops_per_epoch + backprops_per_epoch));
                         sys.stdout.flush()
 
-                        print("\tval acc:\t{:5.2f}%\tprecision:\t{:5.2f}%\trecall:\t{:5.2f}%"
+                        print("--Results: val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                               .format(val_acc * 100.0,precision_score[num_classes-1] * 100.0,recall_score[num_classes-1] * 100.0))
                         ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
