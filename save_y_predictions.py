@@ -56,7 +56,7 @@ def main():
     y_predictions = np.zeros(len(labels_test))
     for num_samples in [1,2,5,25,100]:
         for num_layers_retrained in [1]:
-            convnet = cnn.convnet()
+            convnet = cnn.convnet_oneshot()
             convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
             # convnet.load_param_values("{}convnet_params/param-allclasses".format(base_dir_path))
