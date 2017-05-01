@@ -11,13 +11,6 @@ import convnet_19x1 as cnn
 import os
 from util.dataprocessing import DataPlotter as dp
 
-false_positives = np.zeros(20, dtype=np.int)
-positives = np.zeros(20, dtype=np.int)
-total = np.zeros(20, dtype=np.int)
-
-total_errors = 0
-
-class_accuracies = np.zeros(20, dtype=np.int)
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
 
@@ -41,22 +34,15 @@ def getParamExcludingPath(class_num):
     return "{}convnet_params/model-19/excluding-{}".format(base_dir_path,class_num)
 
 def main():
-
-    load = load_class.load(15)
-    x_test, labels_test, indices_test = load.load_testing_set()
-
     class_num = 15
-    global positives
-    global total
-    global false_positives
-    global total_errors
 
-    base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__)))  # "/home/jasper/oneshot-gestures/
+    load = load_class.load(class_num)
+    x_test, labels_test, indices_test = load.load_testing_set()
+    convnet = cnn.convnet_oneshot()
 
-    y_predictions = np.zeros(len(labels_test))
     for num_samples in [1,2,5,25,100]:
         for num_layers_retrained in [1]:
-            convnet = cnn.convnet_oneshot()
+
             convnet.load_param_values(getParamPath(class_num, num_layers_retrained, num_samples))
             # convnet.load_param_values(getParamExcludingPath(class_num))
             # convnet.load_param_values("{}convnet_params/param-allclasses".format(base_dir_path))
