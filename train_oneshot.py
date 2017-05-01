@@ -127,7 +127,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [25,100]:
+        for num_oneshot_samples in [1,2]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
@@ -138,7 +138,7 @@ if __name__=='__main__':
                 print(len(indices_train[num_classes-1]))
 
                 save_param_path = "{}convnet_params/model-19x1/class-{}/layers{}-samples{}".format(base_dir_path,oneshot_class,retrain_layers,num_oneshot_samples)
-                min_val_err = 20
+                min_val_acc = 0
                 convnet.preload_excluding_model("{}convnet_params/model-19/excluding-{}".format(base_dir_path,oneshot_class))
                 q.join()
 
@@ -160,8 +160,8 @@ if __name__=='__main__':
                         train_err = 0
                         train_batches=0
                         start_time = time.time()
-                        print("\t--- BACKPROP {} to {} ---".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch))
-                        #wait for data
+                        print("BACKPROP\t{:5.0f}-{:5.0f}:".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch));sys.stdout.flush()
+                        #wait for dat
                         q.join()
                         for i in xrange(backprops_per_epoch):
                             # Data kopieren om daarna te starten met augmentatie volgende batch
@@ -173,8 +173,11 @@ if __name__=='__main__':
                             #trainen op de gekopieerde data
                             train_err += convnet.train(sample_batch, label_batch)
                             train_batches += 1
-                            print("\rtrain err:\t{:5.2f}".format(train_err / i), end="");sys.stdout.flush()
-                            print("\t{:5.0f}%".format(100.0 * (i+1) / backprops_per_epoch), end="");sys.stdout.flush()
+                            print("\rBACKPROP\t{:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
+                                                                      j * backprops_per_epoch + backprops_per_epoch));
+                            sys.stdout.flush()
+                            print("\t{:5.0f}%".format(100.0 * (i + 1) / backprops_per_epoch), end="");
+                            sys.stdout.flush()
 
                             q.join()
                         train_loss = train_err / backprops_per_epoch
@@ -183,12 +186,16 @@ if __name__=='__main__':
                         recall_list[j] = recall_score
 
 
-                        if (val_loss < min_val_err):
-                            min_val_err = val_loss
+                        if (val_acc > min_val_acc):
+                            min_val_acc = val_acc
                             convnet.save_param_values(save_param_path)
 
-                        print("\nval err:\t{:5.2f}\nval acc:\t{:5.2f}%\nprecision:\t{:5.2f}%\nrecall:\t{:5.2f}%"
-                              .format(val_loss,val_acc * 100.0,precision_score[num_classes-1] * 100.0,recall_score[num_classes-1] * 100.0))
+                        print("BACKPROP\t{:5.0f}-{:5.0f}:".format(j * backprops_per_epoch + 1,
+                                                                    j * backprops_per_epoch + backprops_per_epoch));
+                        sys.stdout.flush()
+
+                        print("\tval acc:\t{:5.2f}%\tprecision:\t{:5.2f}%\trecall:\t{:5.2f}%"
+                              .format(val_acc * 100.0,precision_score[num_classes-1] * 100.0,recall_score[num_classes-1] * 100.0))
                         ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
                 except KeyboardInterrupt:
@@ -200,12 +207,9 @@ if __name__=='__main__':
                         convnet.load_param_values(save_param_path)
 
                     test_acc, test_acc, precision_score, recall_score = validate(convnet)
-                    print("test-acc:{:5.2f}%".format(test_acc * 100))
-                    print(precision_score)
-                    print(recall_score)
-
                     y_predictions = convnet.test_output(x_test)
 
+                    print("\ttest-acc:{:5.2f}%".format(test_acc * 100))
 
                     directory = "{}output/model-19x1/class-{}/layers{}-samples{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
                     if not os.path.exists(directory):
@@ -217,6 +221,11 @@ if __name__=='__main__':
                     ds.saveToCsv(directory,"acc_loss")
                     np.save("{}precision".format(directory),precision_list)
                     np.save("{}recall".format(directory),recall_list)
+
+                    if not os.path.exists("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class)):
+                        open("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class),'w').close()
+                    with open("{}output/model-19x1/class-{}/test-acc.txt".format(base_dir_path,oneshot_class), 'ab') as f:
+                        f.write("layers{};samples{};{}".format(retrain_layers, num_classes, 1.0 * test_acc))
 
 
 
