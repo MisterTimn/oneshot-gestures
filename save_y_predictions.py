@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet as cnn
+import convnet_19x1 as cnn
 import os
 from util.dataprocessing import DataPlotter as dp
 
