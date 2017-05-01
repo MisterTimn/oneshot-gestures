@@ -41,7 +41,7 @@ def worker_backprop(q):
     sharedLabelArray = sa.attach("shm://labels")
     indices = np.empty(batch_size,dtype='int32')
 
-    indices_train[num_classes - 1] = indices_train_oneshotclass[:samples]
+    # indices_train[num_classes - 1] = indices_train_oneshotclass[:samples]
 
     print(len(indices_train[num_classes-1]))
 
