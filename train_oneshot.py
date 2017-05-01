@@ -112,7 +112,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2,5,25]:
+        for num_oneshot_samples in [1,2,5,25,50,100,200]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
@@ -138,7 +138,7 @@ if __name__=='__main__':
 
                 try:
                     backprops_per_epoch = 200
-                    num_backprops = 20000 / backprops_per_epoch
+                    num_backprops = 10000 / backprops_per_epoch
                     precision_list = np.zeros((num_backprops,num_classes))
                     recall_list = np.zeros((num_backprops,num_classes))
                     for j in xrange(num_backprops):
