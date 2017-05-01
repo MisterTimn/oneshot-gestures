@@ -9,7 +9,7 @@ import os
 
 
 import augmentation as aug
-import convnet_v2_oneshot as cnn
+import convnet_19x1 as cnn
 #import convnet as cnn
 import load_class
 from util.dataprocessing import DataSaver
@@ -86,8 +86,7 @@ def validate(convnet):
     val_batches = 0
     precision_score = np.zeros((num_classes))
     recall_score = np.zeros((num_classes))
-    # num_valid_class_acc = 0
-    # class_acc = 0
+
     for batch in iterate_minibatches(x_validate, labels_validate, batch_size, indices_validate, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
@@ -95,11 +94,6 @@ def validate(convnet):
         val_acc += acc
         precision_score = np.add(precision_score,metrics.precision_score(targets,convnet.test_output(inputs),xrange(num_classes),average=None))
         recall_score    = np.add(recall_score, metrics.recall_score(targets,convnet.test_output(inputs),xrange(num_classes),average=None))
-
-        # predict_count, class_count = getClassAccuracy(targets, convnet.test_output(inputs), oneshot_class)
-        # if ( class_count != 0 ):
-        #     class_acc += 1.0 * predict_count / class_count
-        #     num_valid_class_acc += 1
         val_batches += 1
     return val_err/val_batches, val_acc/val_batches, precision_score/val_batches, recall_score/val_batches
 
@@ -204,18 +198,26 @@ if __name__=='__main__':
                 finally:
                     if os.path.exists(save_param_path):
                         convnet.load_param_values(save_param_path)
-                        test_acc, test_acc, precision_score, recall_score = validate(convnet)
-                        print("test-acc:{:5.2f}%".format(test_acc * 100))
-                        print(precision_score)
-                        print(recall_score)
+
+                    test_acc, test_acc, precision_score, recall_score = validate(convnet)
+                    print("test-acc:{:5.2f}%".format(test_acc * 100))
+                    print(precision_score)
+                    print(recall_score)
+
+                    y_predictions = convnet.test_output(x_test)
+
 
                     directory = "{}output/model-19x1/class-{}/layers{}-samples{}/".format(base_dir_path, oneshot_class,retrain_layers,num_oneshot_samples)
                     if not os.path.exists(directory):
                         os.makedirs(directory)
+
+                    np.save("{}y_predictions".format(directory),y_predictions)
+
                     ds.saveToArray(directory)
                     ds.saveToCsv(directory,"acc_loss")
                     np.save("{}precision".format(directory),precision_list)
                     np.save("{}recall".format(directory),recall_list)
+
 
 
     except:

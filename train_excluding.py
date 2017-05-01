@@ -8,7 +8,7 @@ import time
 import os
 
 import augmentation as aug
-import convnet_v2 as cnn
+import convnet_19 as cnn
 import load_class
 from util.dataprocessing import DataSaver
 

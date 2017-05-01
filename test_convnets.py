@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet_v2_oneshot as cnn
+import convnet_19x1 as cnn
 import os
 
 false_positives = np.zeros(20, dtype=np.int)
