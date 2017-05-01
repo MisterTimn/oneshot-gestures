@@ -6,14 +6,14 @@ import numpy as np
 import sys
 import time
 import os
-
+from sklearn import metrics
 
 import augmentation as aug
 import convnet_19x1 as cnn
 #import convnet as cnn
 import load_class
 from util.dataprocessing import DataSaver
-from sklearn import metrics
+
 
 
 num_classes = 20
@@ -27,7 +27,6 @@ indices_train_oneshotclass = indices_train[num_classes-1]
 x_validate, labels_validate, indices_validate = loader.load_validation_set()
 x_test, labels_test, indices_test = loader.load_testing_set()
 
-class_accuracies = np.zeros(20,dtype=np.int)
 
 # convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=1)
 
@@ -69,17 +68,6 @@ def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=Fals
         excerpt = indices[start_idx:start_idx + batch_size]
         yield inputs[excerpt], targets[excerpt]
 
-def getClassAccuracy(targets, predictions, class_num):
-    assert(len(targets)==len(predictions))
-    predict_count = 0
-    class_count = 0
-    for i in xrange(len(targets)):
-        if(targets[i] == class_num):
-            class_count += 1
-            if(targets[i] == predictions[i]):
-                predict_count += 1
-    return predict_count, class_count
-
 def validate(convnet):
     val_err = 0
     val_acc = 0
@@ -96,18 +84,6 @@ def validate(convnet):
         recall_score    = np.add(recall_score, metrics.recall_score(targets,convnet.test_output(inputs),xrange(num_classes),average=None))
         val_batches += 1
     return val_err/val_batches, val_acc/val_batches, precision_score/val_batches, recall_score/val_batches
-
-# def test(convnet):
-#     test_err = 0
-#     test_acc = 0
-#     test_batches = 0
-#     for batch in iterate_minibatches(x_test, labels_test, batch_size, indices_test, shuffle=False):
-#         inputs, targets = batch
-#         err, acc = convnet.validate(inputs, targets)
-#         test_err += err
-#         test_acc += acc
-#         test_batches += 1
-#     return test_acc / test_batches
 
 if __name__=='__main__':
     try:
