@@ -20,8 +20,8 @@ ONESHOT_CLASS   =   15
 
 OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
 PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
-EXCLUDING_PARAM_DIRECTORY   \
-                =   "{}convnet_params/{}/excluding-{}/".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
+EXCLUDING_PARAM_PATH   \
+                =   "{}convnet_params/{}/excluding-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
 
 if not os.path.exists(OUTPUT_DIRECTORY):
     os.makedirs(OUTPUT_DIRECTORY)
@@ -125,7 +125,7 @@ if __name__=='__main__':
                 min_val_acc = 0
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                convnet.preload_excluding_model(EXCLUDING_PARAM_DIRECTORY)
+                convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
 
                 save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
 
