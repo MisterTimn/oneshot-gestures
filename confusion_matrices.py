@@ -22,8 +22,8 @@ class_num = 15
 
 y_test = np.load("{}output/y_tests/class{}.npy".format(base_dir_path,class_num))
 
-y_pred = np.load("{}output/model-19x1/class-15/layers1-samples2/y_predictions.npy".format(base_dir_path))
+y_pred = np.load("{}output/model-19x1/class-15/layers1-samples1/y_predictions.npy".format(base_dir_path))
 
 # labels_test = np.load("{}output/y_tests/y_test.npy".format(base_dir_path))
 #
-dp.plotConfusionMatrix(y_test,y_pred,"{}output/model-19x1/class-15/layers1-samples2/conf-matr".format(base_dir_path))
+dp.plotConfusionMatrix(y_test,y_pred,"{}output/model-19x1/class-15/layers1-samples1/conf-matr".format(base_dir_path))
