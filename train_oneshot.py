@@ -95,11 +95,12 @@ def validate(convnet):
     return val_err/val_batches, val_acc/val_batches, precision_score/val_batches, recall_score/val_batches
 
 if __name__=='__main__':
+    q = mp.JoinableQueue()
     try:
         sharedSampleArray = sa.create("shm://samples", (batch_size, 12, 64, 64), dtype='float32')
         sharedLabelArray = sa.create("shm://labels", batch_size, dtype='int32')
 
-        q = mp.JoinableQueue()
+
         proc = mp.Process(target=worker_backprop, args=[q])
         proc.daemon = True
         proc.start()
