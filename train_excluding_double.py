@@ -36,6 +36,17 @@ samples, labels, indices_train = loader.load_training_set()
 x_validate, labels_validate, indices_validate = loader.load_validation_set()
 x_test, labels_test, indices_test = loader.load_testing_set()
 
+val_indices_to_keep = indices_validate[0]
+test_indices_to_keep = indices_test[0]
+for i in xrange(1,18):
+    val_indices_to_keep = np.concatenate((val_indices_to_keep,indices_validate[i]),axis=0)
+    test_indices_to_keep = np.concatenate((test_indices_to_keep,indices_test[i]),axis=0)
+
+x_validate = x_validate[val_indices_to_keep]
+labels_validate = labels_validate[val_indices_to_keep]
+x_test = x_test[test_indices_to_keep]
+labels_test = labels_test[test_indices_to_keep]
+
 BATCH_SIZE = 32
 
 TOTAL_BACKPROPS = 60000
@@ -171,9 +182,7 @@ if __name__=='__main__':
                                                   j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
                 sys.stdout.flush()
 
-                print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
-                      .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0,
-                              recall_score[NUM_CLASSES - 1] * 100.0))
+                print(" val acc: {:5.2f}%".format(val_acc * 100.0))
 
                 ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
