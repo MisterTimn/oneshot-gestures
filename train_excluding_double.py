@@ -29,6 +29,15 @@ ONESHOT_CLASS_2 =   15
 OUTPUT_DIRECTORY=   "{}output/{}/excluding-{}-{}/".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS,ONESHOT_CLASS_2)
 EXCLUDING_PARAM_PATH   \
                 =   "{}convnet_params/{}/excluding-{}-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS,ONESHOT_CLASS_2)
+PARAM_PATH   \
+                =   "{}convnet_params/{}/".format(BASE_DIR,MODEL_EXCLUDING)
+
+if not os.path.exists(OUTPUT_DIRECTORY):
+    os.makedirs(OUTPUT_DIRECTORY)
+
+if not os.path.exists(PARAM_PATH):
+    os.makedirs(PARAM_PATH)
+
 
 loader = load_class.load(ONESHOT_CLASS, ONESHOT_CLASS_2)
 
@@ -201,8 +210,7 @@ if __name__=='__main__':
 
             print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-            if not os.path.exists(OUTPUT_DIRECTORY):
-                os.makedirs(OUTPUT_DIRECTORY)
+
 
             np.save("{}y_predictions".format(OUTPUT_DIRECTORY), y_predictions)
             ds.saveToArray(OUTPUT_DIRECTORY)
