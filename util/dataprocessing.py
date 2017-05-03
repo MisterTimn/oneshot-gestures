@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.lines as mlines
 import numpy as np
 import os
 import itertools
@@ -68,6 +69,11 @@ class DataPlotter:
     def __init__(self):
         print
         mpl.rcParams['pgf.rcfonts']=False
+        blue_line =     mlines.Line2D([],[],color='blue', marker='o')
+        red_line =      mlines.Line2D([],[],color='red', marker='o')
+        green_line =    mlines.Line2D([],[],color='green', marker='o')
+        yellow_line =   mlines.Line2D([],[], color='yellow', marker='o')
+        self.lines=(blue_line,red_line,green_line,yellow_line)
         # mpl.rcParams['pgf.texsystem'] = u'xelatex',  # change this if using xetex or lautex
 
 
@@ -88,11 +94,33 @@ class DataPlotter:
 
         plt.show()
 
-    def plotCompare(self,list_of_data):
+    def plotAccF1(self,y_test,y_predictions,x_labels,oneshot_class,title="F1 score"):
         plt.grid(True)
-        for data in list_of_data:
-            plt.plot(data, 'o')
+        f1_weighted = np.zeros(len(y_predictions))
+        f1_class = np.zeros(len(y_predictions))
+        i=0
+        for y_pred in y_predictions:
+            f1_scores = metrics.f1_score(y_test,y_pred,average=None)
+            f1_class[i] = f1_scores[oneshot_class]
+            f1_weighted[i] = metrics.f1_score(y_test,y_pred,average='weighted')
+            # accuracies[i] = metrics.accuracy_score(y_test,y_pred)
+            i+=1
 
+        plt.xticks(np.arange(len(x_labels)),x_labels)
+        plt.xlabel("Number of samples")
+        plt.ylabel("F1 score")
+
+        plt.plot(f1_weighted,'b')
+        plt.plot(f1_class,'r')
+
+        plt.plot(f1_weighted, 'bo')
+        plt.plot(f1_class, 'ro')
+
+        blue_line =     mlines.Line2D([],[],color='blue', marker='o',label='Weighted F1-score')
+        red_line =      mlines.Line2D([],[],color='red', marker='o',label="F1-score oneshot-class")
+
+        plt.legend(handles=(blue_line,red_line))
+        plt.title(title)
         plt.show()
 
     def plot_confusion_matrix(self,cm, classes,
@@ -125,10 +153,6 @@ class DataPlotter:
                 plt.text(j, i, cm[i, j],
                          horizontalalignment="center",
                          color="white" if cm[i, j] > thresh else "black")
-
-        print(cm)
-
-
 
         # plt.tight_layout()
         plt.ylabel('True label')
