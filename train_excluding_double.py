@@ -126,7 +126,7 @@ if __name__=='__main__':
 
         try:
             q = mp.JoinableQueue()
-            proc = mp.Process(target=worker_backprop, args=[q, samples, labels, indices_train])
+            proc = mp.Process(target=worker_backprop, args=[q])
             proc.daemon = True
             proc.start()
 
