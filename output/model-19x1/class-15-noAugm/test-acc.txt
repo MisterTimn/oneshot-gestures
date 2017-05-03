@@ -1,0 +1,3 @@
+layers1;samples1;0.779233870968
+layers1;samples2;0.780241935484
+layers1;samples5;0.79939516129

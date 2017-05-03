@@ -1,0 +1,9 @@
+Initializing load_module... (0/4)Initializing load_module... (1/4)Initializing load_module... (2/4)Initializing load_module... (4/4)
+Loading training set...
+Loading validation set...
+Loading test set...
+Initializing convnet model
+308
+Compiling train function
+Compiling validation function
+Functions compiled, convnet model initialized
