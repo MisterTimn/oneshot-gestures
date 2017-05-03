@@ -49,6 +49,12 @@ class convnet_oneshot(object):
         self.dense_excluding = nn.layers.DenseLayer(self.dense2,
                                             num_units=num_output_units-1,
                                             nonlinearity=nn.nonlinearities.identity	)
+        if(num_layers_retrain==2):
+            self.dense_excluding = nn.layers.DenseLayer(self.dense2,
+                                                        num_units=num_output_units - 1,
+                                                        W=nn.init.Constant(0.0),
+                                                        b=nn.init.Constant(0.0),
+                                                        nonlinearity=nn.nonlinearities.identity)
 
         #w b initialiseren op 0
         self.dense_oneshot = nn.layers.DenseLayer(self.dense2,
@@ -85,12 +91,11 @@ class convnet_oneshot(object):
 
         params = self.network.get_params(trainable=True)
         params.extend(self.concat.get_params(trainable=True))
-        # params.extend(self.dense_excluding.get_params(trainable=True))
         params.extend(self.dense_oneshot.get_params(trainable=True))
-        # if(num_layers_retrain>=2):
-        #     params.extend(self.dense2.get_params(trainable=True))
-        # if(num_layers_retrain>=3):
-        #     params.extend(self.dense1.get_params(trainable=True))
+        if(num_layers_retrain>=2):
+            params.extend(self.dense_excluding.get_params(trainable=True))
+        if(num_layers_retrain>=3):
+            params.extend(self.dense2.get_params(trainable=True))
 
         updates = nn.updates.nesterov_momentum(	loss, params,
                                                 learning_rate=0.0001,

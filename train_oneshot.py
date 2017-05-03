@@ -116,7 +116,7 @@ if __name__=='__main__':
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
         for num_oneshot_samples in [1,2,3,4,5]:
-            for retrain_layers in [1]:
+            for retrain_layers in [2]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
                 precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                 recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
