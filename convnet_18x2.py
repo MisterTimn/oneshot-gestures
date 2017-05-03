@@ -52,7 +52,7 @@ class convnet_oneshot(object):
 
         #w b initialiseren op 0
         self.dense_oneshot = nn.layers.DenseLayer(self.dense2,
-                                                  num_units=1,
+                                                  num_units=2,
                                                   W=nn.init.Constant(0.0),
                                                   b=nn.init.Constant(0.0),
                                                   nonlinearity=nn.nonlinearities.identity )
