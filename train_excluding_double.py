@@ -50,7 +50,7 @@ labels_test = labels_test[test_indices_to_keep]
 BATCH_SIZE = 32
 
 TOTAL_BACKPROPS = 60000
-BACKPROPS_PER_EPOCH = 400
+BACKPROPS_PER_EPOCH = 20
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -150,7 +150,6 @@ if __name__=='__main__':
                 train_err = 0
                 train_batches=0
                 start_time = time.time()
-                print("\t--- BACKPROP {} to {} ---".format(j*BACKPROPS_PER_EPOCH+1,j*BACKPROPS_PER_EPOCH+BACKPROPS_PER_EPOCH))
                 #wait for data
                 q.join()
                 for i in xrange(BACKPROPS_PER_EPOCH):
@@ -200,10 +199,10 @@ if __name__=='__main__':
 
             print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-            np.save("{}y_predictions".format(OUTPUT_DIRECTORY), y_predictions)
-
             if not os.path.exists(OUTPUT_DIRECTORY):
                 os.makedirs(OUTPUT_DIRECTORY)
+
+            np.save("{}y_predictions".format(OUTPUT_DIRECTORY), y_predictions)
             ds.saveToArray(OUTPUT_DIRECTORY)
             ds.saveToCsv(OUTPUT_DIRECTORY,"acc_loss")
 
