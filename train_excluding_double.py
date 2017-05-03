@@ -90,6 +90,8 @@ def validate(convnet,x_validate,labels_validate):
     val_err = 0
     val_acc = 0
     val_batches = 0
+    precision_score = np.zeros((NUM_CLASSES))
+    recall_score = np.zeros((NUM_CLASSES))
     for batch in iterate_minibatches(x_validate, labels_validate, BATCH_SIZE, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
