@@ -54,8 +54,6 @@ def worker_backprop(q):
 
     # indices_train[num_classes - 1] = indices_train_oneshotclass[:samples]
 
-    print(len(indices_train[NUM_CLASSES - 1]))
-
     while not done:
         cmd = q.get()
         if cmd == 'done':
@@ -68,6 +66,7 @@ def worker_backprop(q):
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
             q.task_done()
+            print("does this fuck up?")
             indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass[:int(q.get())]
             indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass_2[:int(q.get())]
             print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
@@ -136,6 +135,8 @@ if __name__=='__main__':
                 q.join()
                 q.put(num_oneshot_samples)
                 q.join()
+
+                print("what fucks up?")
 
                 try:
                     for j in xrange(NUM_EPOCHS):

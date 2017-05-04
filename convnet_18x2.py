@@ -113,6 +113,7 @@ class convnet_oneshot(object):
 
         print("Functions compiled, convnet model initialized")
         self.test_output = theano.function([input_var], output)
+        print("Functions compiled, convnet model initialized")
 
     # def log_loss(self, y, t, eps=1e-15):
     #     """
