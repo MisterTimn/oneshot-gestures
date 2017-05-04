@@ -29,7 +29,7 @@ if not os.path.exists(OUTPUT_DIRECTORY):
 if not os.path.exists(PARAM_DIRECTORY):
     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 10000
+TOTAL_BACKPROPS = 5000
 BACKPROPS_PER_EPOCH = 100
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
@@ -117,7 +117,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [25,100,200]:
+        for num_oneshot_samples in [1,2,3,4,5]:
             for retrain_layers in [1]:
                 ds = DataSaver(('train_loss2', 'val_loss2', 'val_acc2', 'dt2'))
                 precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
