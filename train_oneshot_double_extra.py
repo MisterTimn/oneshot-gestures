@@ -127,8 +127,7 @@ if __name__=='__main__':
                 min_val_acc = 0
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
-                convnet.load_param_values(save_param_path)
+                # convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
 
                 save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
                 convnet.load_param_values(save_param_path)
