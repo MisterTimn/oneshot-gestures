@@ -9,19 +9,20 @@ import os
 from sklearn import metrics
 
 import augmentation as aug
-import convnet_19x1 as cnn
+import convnet_18x2 as cnn
 import load_class
 from util.dataprocessing import DataSaver
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_VERS      =   "model-19x1-temp"
-MODEL_EXCLUDING =   "model-19"
-ONESHOT_CLASS   =   15
+MODEL_VERS      =   "model-18x2"
+MODEL_EXCLUDING =   "model-18"
+ONESHOT_CLASS   =   14
+ONESHOT_CLASS_2 =   15
 
-OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
-PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
+OUTPUT_DIRECTORY=   "{}output/{}/class-{}-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS,ONESHOT_CLASS_2)
+PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS,ONESHOT_CLASS_2)
 EXCLUDING_PARAM_PATH   \
-                =   "{}convnet_params/{}/excluding-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
+                =   "{}convnet_params/{}/excluding-{}-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS,ONESHOT_CLASS_2)
 
 if not os.path.exists(OUTPUT_DIRECTORY):
     os.makedirs(OUTPUT_DIRECTORY)
@@ -35,10 +36,11 @@ NUM_CLASSES = 20
 BATCH_SIZE = 32
 
 augmenter = aug.augmenter()
-loader = load_class.load(14,15)
+loader = load_class.load(ONESHOT_CLASS,ONESHOT_CLASS_2)
 
 samples, labels, indices_train = loader.load_training_set()
-indices_train_oneshotclass = indices_train[NUM_CLASSES - 1]
+indices_train_oneshotclass = indices_train[NUM_CLASSES - 2]
+indices_train_oneshotclass_2 = indices_train[NUM_CLASSES - 1]
 x_validate, labels_validate, indices_validate = loader.load_validation_set()
 x_test, labels_test, indices_test = loader.load_testing_set()
 
@@ -66,7 +68,8 @@ def worker_backprop(q):
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
             q.task_done()
-            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
+            indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass[:int(q.get())]
+            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass_2[:int(q.get())]
             print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
         q.task_done()
 
@@ -116,7 +119,7 @@ if __name__=='__main__':
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
         for num_oneshot_samples in [1,2,3,4,5]:
-            for retrain_layers in [2]:
+            for retrain_layers in [1]:
                 ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
                 precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                 recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
@@ -176,8 +179,10 @@ if __name__=='__main__':
                                                           j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
                         sys.stdout.flush()
 
-                        print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
-                              .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
+                        print(" val acc: {:5.2f}%, precision: {:5.2f}% - {:5.2f}%, recall: {:5.2f}% - {:5.2f}%"
+                              .format(val_acc * 100.0,
+                                      precision_score[NUM_CLASSES - 2] * 100.0, precision_score[NUM_CLASSES - 1] * 100.0,
+                                      recall_score[NUM_CLASSES - 2] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
                 except KeyboardInterrupt:
                     print("Iteration stopped through KeyboardInterrupt")
