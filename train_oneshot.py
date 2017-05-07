@@ -185,7 +185,7 @@ if __name__=='__main__':
 
                         if patience == 5:
                             print("No more improvement")
-                            break
+                            # break
                 except KeyboardInterrupt:
                     print("Iteration stopped through KeyboardInterrupt")
                 except:
