@@ -119,7 +119,7 @@ if __name__=='__main__':
         # num_oneshot_samples = 2
         for num_oneshot_samples in [1,2,3,4,5]:
             for retrain_layers in [1]:
-                ds = DataSaver(('train_loss2', 'val_loss2', 'val_acc2', 'dt2'))
+                ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
                 precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                 recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
 
@@ -203,12 +203,12 @@ if __name__=='__main__':
                     if not os.path.exists(directory):
                         os.makedirs(directory)
 
-                    np.save("{}y_predictions2".format(directory),y_predictions)
+                    np.save("{}y_predictions".format(directory),y_predictions)
 
                     ds.saveToArray(directory)
-                    ds.saveToCsv(directory,"acc_loss2")
-                    np.save("{}precision2".format(directory),precision_list)
-                    np.save("{}recall2".format(directory),recall_list)
+                    ds.saveToCsv(directory,"acc_loss")
+                    np.save("{}precision".format(directory),precision_list)
+                    np.save("{}recall".format(directory),recall_list)
 
                     if not os.path.exists("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS)):
                         open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()

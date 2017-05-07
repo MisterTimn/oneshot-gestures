@@ -12,7 +12,11 @@ import os
 
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/
 
-for class_num in xrange(20):
-    load = load_class.load(class_num)
-    x_test, labels_test, indices_test = load.load_testing_set()
-    np.save("{}/output/y_tests/class{}".format(base_dir_path,class_num),labels_test)
+# for class_num in xrange(20):
+#     load = load_class.load(class_num)
+#     x_test, labels_test, indices_test = load.load_testing_set()
+#     np.save("{}/output/y_tests/class{}".format(base_dir_path,class_num),labels_test)
+
+load = load_class.load(14,15)
+x_test, labels_test, indices_test = load.load_testing_set()
+np.save("{}/output/y_tests/class-14-15".format(base_dir_path),labels_test)

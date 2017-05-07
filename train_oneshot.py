@@ -28,8 +28,8 @@ if not os.path.exists(OUTPUT_DIRECTORY):
 if not os.path.exists(PARAM_DIRECTORY):
     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 5000
-BACKPROPS_PER_EPOCH = 100
+TOTAL_BACKPROPS = 10000
+BACKPROPS_PER_EPOCH = 200
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -122,7 +122,8 @@ if __name__=='__main__':
                 recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
 
 
-                min_val_acc = 0
+                min_val_loss = 20
+                patience = 0
 
                 convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
                 convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
@@ -168,9 +169,12 @@ if __name__=='__main__':
 
                         ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
-                        if (val_acc > min_val_acc):
-                            min_val_acc = val_acc
+                        if (val_loss < min_val_loss):
+                            min_val_loss = val_loss
                             convnet.save_param_values(save_param_path)
+                            patience=0
+                        else:
+                            patience+=1
 
                         print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
                                                           j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
@@ -179,6 +183,9 @@ if __name__=='__main__':
                         print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                               .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
+                        if patience == 5:
+                            print("No more improvement")
+                            break
                 except KeyboardInterrupt:
                     print("Iteration stopped through KeyboardInterrupt")
                 except:

@@ -7,6 +7,7 @@ import time
 
 import os
 import util.dataprocessing
+from sklearn import metrics
 dp = util.dataprocessing.DataPlotter()
 
 
@@ -23,15 +24,20 @@ PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,O
 EXCLUDING_PARAM_PATH   \
                 =   "{}convnet_params/{}/excluding-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
 
-x_labels = (1,2,3,4,5,25,100,200)
-y_test = np.load("{}output/y_tests/class{}.npy".format(base_dir_path,ONESHOT_CLASS))
-y_predictions = np.empty((len(x_labels),len(y_test)))
+# x_labels = (1,2,3,4,5,25,100,200)
+# y_test = np.load("{}output/y_tests/class{}.npy".format(base_dir_path,ONESHOT_CLASS))
+# y_predictions = np.empty((len(x_labels),len(y_test)))
+#
+# i = 0
+# for num_samples in x_labels:
+#     y_predictions[i] = np.load("{}layers1-samples{}/y_predictions.npy".format(OUTPUT_DIRECTORY,num_samples))
+#     # dp.plotConfusionMatrix(y_test,y_predictions[i],"{}layers1-samples{}/conf-matr".format(OUTPUT_DIRECTORY,num_samples))
+#     i+=1
+#
+#
+# dp.plotAccF1(y_test,y_predictions,x_labels,19,"Learning gesture 15, retrain level 1")
 
-i = 0
-for num_samples in x_labels:
-    y_predictions[i] = np.load("{}layers1-samples{}/y_predictions.npy".format(OUTPUT_DIRECTORY,num_samples))
-    # dp.plotConfusionMatrix(y_test,y_predictions[i],"{}layers1-samples{}/conf-matr".format(OUTPUT_DIRECTORY,num_samples))
-    i+=1
+y_pred = np.load("/home/jasper/oneshot-gestures/output/conf_matrix_data/all.npy")
+y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
 
-
-dp.plotAccF1(y_test,y_predictions,x_labels,19,"Learning gesture 15, retrain level 1")
+print(metrics.classification_report(y_test,y_pred))

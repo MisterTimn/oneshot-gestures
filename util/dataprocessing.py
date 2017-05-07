@@ -123,6 +123,40 @@ class DataPlotter:
         plt.title(title)
         plt.show()
 
+    def plotDoubleClassF1(self,y_test,y_predictions,x_labels,oneshot_class,oneshot_class_2,title="F1 score"):
+        plt.grid(True)
+        f1_weighted = np.zeros(len(y_predictions))
+        f1_class_1 = np.zeros(len(y_predictions))
+        f1_class_2 = np.zeros(len(y_predictions))
+        i=0
+        for y_pred in y_predictions:
+            f1_scores = metrics.f1_score(y_test,y_pred,average=None)
+            f1_class_1[i] = f1_scores[oneshot_class]
+            f1_class_2[i] = f1_scores[oneshot_class_2]
+            f1_weighted[i] = metrics.f1_score(y_test,y_pred,average='weighted')
+            # accuracies[i] = metrics.accuracy_score(y_test,y_pred)
+            i+=1
+
+        plt.xticks(np.arange(len(x_labels)),x_labels)
+        plt.xlabel("Number of samples")
+        plt.ylabel("F1 score")
+
+        plt.plot(f1_weighted,'b')
+        plt.plot(f1_class_1,'r')
+        plt.plot(f1_class_2, 'g')
+
+        plt.plot(f1_weighted, 'bo')
+        plt.plot(f1_class_1, 'ro')
+        plt.plot(f1_class_2, 'go')
+
+        blue_line =     mlines.Line2D([],[],color='blue', marker='o',label='Weighted F1-score')
+        red_line =      mlines.Line2D([],[],color='red', marker='o',label="F1-score gesture {}".format(14))
+        green_line =    mlines.Line2D([],[],color='green', marker='o',label="F1-score gesture {}".format(15))
+
+        plt.legend(handles=(blue_line,red_line,green_line))
+        plt.title(title)
+        plt.show()
+
     def plot_confusion_matrix(self,cm, classes,
                               normalize=False,
                               title='Confusion matrix',
@@ -158,7 +192,7 @@ class DataPlotter:
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
 
-    def plotConfusionMatrix(self, y_test, y_pred, savePath=None):
+    def plotConfusionMatrix(self, y_test, y_pred,title="Confusion Matrix", savePath=None):
         class_names = ["0"]
         for i in xrange(1,20):
             class_names.append("{}".format(i))
@@ -171,7 +205,7 @@ class DataPlotter:
         # Plot non-normalized confusion matrix
         plt.figure(figsize=(8,6))
         self.plot_confusion_matrix(cnf_matrix, classes=class_names,
-                              title='Confusion matrix')
+                              title=title)
         if savePath != None:
             # plt.savefig("{}.pgf".format(savePath))
             plt.savefig("{}.pdf".format(savePath))
@@ -179,12 +213,12 @@ class DataPlotter:
         # Plot normalized confusion matrix
         plt.figure(figsize=(8,6))
         self.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-                              title='Normalized confusion matrix')
+                              title="{} normalized".format(title))
         if savePath != None:
             # plt.savefig("{}-norm.pgf".format(savePath))
             plt.savefig("{}-norm.pdf".format(savePath))
 
-        plt.show()
+        # plt.show()
 
 
 

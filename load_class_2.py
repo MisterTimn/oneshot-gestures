@@ -8,7 +8,7 @@ import sys
 
 class load(object):
 
-    def __init__(self, oneshot_class=19):
+    def __init__(self, oneshot_class=19,oneshot_class_2=None):
         print
         print("Initializing load_module... (0/4)",end="")
         sys.stdout.flush()
@@ -17,6 +17,7 @@ class load(object):
 
         self.num_classes = 20
         self.oneshot_class=oneshot_class
+        self.oneshot_class_2=oneshot_class_2
 
         file = h5py.File(data_path+"data_ints.hdf5","r")
         print("\rInitializing load_module... (1/4)", end="");sys.stdout.flush()
@@ -31,16 +32,31 @@ class load(object):
         self.labels_original = np.zeros(len(labels_original), dtype='int8')
         print("\rInitializing load_module... (4/4)");sys.stdout.flush()
 
-        #Change the class labels so that the oneshot class is last
+        #Change the class labels so that the oneshot classses are last
         i = 0
-        for label in labels_original:
-            if label == self.oneshot_class:
-                self.labels_original[i] = self.num_classes - 1
-            elif label > self.oneshot_class:
-                self.labels_original[i] = label - 1
-            else:
-                self.labels_original[i] = label
-            i += 1
+        if self.oneshot_class_2 != None:
+            for label in labels_original:
+
+                if label == self.oneshot_class:
+                    self.labels_original[i] = self.num_classes - 2
+                elif label == self.oneshot_class_2:
+                    self.labels_original[i] = self.num_classes - 1
+                elif label > self.oneshot_class_2:
+                    self.labels_original[i] = label - 2
+                elif label > self.oneshot_class:
+                    self.labels_original[i] = label - 1
+                else:
+                    self.labels_original[i] = label
+                i += 1
+        else:
+            for label in labels_original:
+                if label == self.oneshot_class:
+                    self.labels_original[i] = self.num_classes - 1
+                elif label > self.oneshot_class:
+                    self.labels_original[i] = label - 1
+                else:
+                    self.labels_original[i] = label
+                i += 1
 
         self.sample_size = int((self.samples.shape[0]))
 
