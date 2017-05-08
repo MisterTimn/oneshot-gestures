@@ -20,6 +20,8 @@ augmenter = aug.augmenter()
 # x_validate, labels_validate, indices_validate = loader.load_validation_set()
 # x_test, labels_test, indices_test = loader.load_testing_set()
 
+
+
 base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
 num_classes = 20
 batch_size = 32
@@ -117,7 +119,7 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for oneshot_class in xrange(9,14):
+        for oneshot_class in xrange(6,7,18,19):
 
             loader = load_class.load(oneshot_class)
             print(loader.get_oneshot())
@@ -134,7 +136,7 @@ if __name__=='__main__':
             ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
 
             convnet = cnn.convnet(num_output_units=19)
-            save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
+            save_param_path = "{}convnet_params/model-19/excluding-{}".format(base_dir_path, oneshot_class)
 
             try:
                 q = mp.JoinableQueue()
@@ -191,7 +193,7 @@ if __name__=='__main__':
                     test_acc = test(convnet,x_test,labels_test)
                     print("test-acc:{:5.2f}%".format(test_acc * 100))
 
-                directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
+                directory = "{}output/model-19/excluding-{}/".format(base_dir_path, oneshot_class)
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 ds.saveToArray(directory)
