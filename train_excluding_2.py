@@ -9,21 +9,28 @@ import os
 
 import augmentation as aug
 import convnet_19 as cnn
-import load_class_2 as load_class
-from util.dataprocessing import DataSaver
+import load_class
+
+from sklearn import metrics
 
 augmenter = aug.augmenter()
 
+BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
+MODEL_EXCLUDING =   "model-18"
 
-# loader = load_class.load()
-#
-# samples, labels, indices_train = loader.load_training_set()
-# x_validate, labels_validate, indices_validate = loader.load_validation_set()
-# x_test, labels_test, indices_test = loader.load_testing_set()
+PARAM_PATH   \
+                =   "{}convnet_params/{}/".format(BASE_DIR,MODEL_EXCLUDING)
+if not os.path.exists(PARAM_PATH):
+    os.makedirs(PARAM_PATH)
 
-base_dir_path = "{}/".format(os.path.dirname(os.path.abspath(__file__))) #"/home/jasper/oneshot-gestures/"
-num_classes = 20
-batch_size = 32
+
+
+TOTAL_BACKPROPS = 60000
+BACKPROPS_PER_EPOCH = 1000
+NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
+
+NUM_CLASSES = 20
+BATCH_SIZE = 32
 
 def worker_backprop(q,samples,labels,indices_train):
     #Data voor volgende iteratie ophalen en verwerken
@@ -31,7 +38,7 @@ def worker_backprop(q,samples,labels,indices_train):
     done = False
     sharedSampleArray = sa.attach("shm://samples2")
     sharedLabelArray = sa.attach("shm://labels2")
-    indices = np.empty(batch_size,dtype='int32')
+    indices = np.empty(BATCH_SIZE, dtype='int32')
 
     while not done:
         cmd = q.get()
@@ -39,8 +46,8 @@ def worker_backprop(q,samples,labels,indices_train):
             done = True
         elif cmd == 'batch':
             # classes = np.random.choice(class_choices,batch_size)
-            classes = np.random.randint(num_classes-1, size=batch_size)
-            for i in xrange(batch_size):
+            classes = np.random.randint(NUM_CLASSES - 1, size=BATCH_SIZE)
+            for i in xrange(BATCH_SIZE):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
@@ -48,7 +55,7 @@ def worker_backprop(q,samples,labels,indices_train):
             q.task_done()
             class_choices = []
             for class_num in xrange(20):
-                if class_num != num_classes-1:
+                if class_num != NUM_CLASSES-1:
                     class_choices.append(class_num)
         q.task_done()
 
@@ -77,19 +84,18 @@ def validate(convnet,x_validate,labels_validate):
     val_err = 0
     val_acc = 0
     val_batches = 0
-    for batch in iterate_minibatches(x_validate, labels_validate, batch_size, True):
+    for batch in iterate_minibatches(x_validate, labels_validate, BATCH_SIZE, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         val_err += err
         val_acc += acc
-        val_batches += 1
     return val_err/val_batches, val_acc/val_batches
 
 def test(convnet,x_test,labels_test):
     test_err = 0
     test_acc = 0
     test_batches = 0
-    for batch in iterate_minibatches(x_test, labels_test, batch_size, shuffle=False):
+    for batch in iterate_minibatches(x_test, labels_test, BATCH_SIZE, shuffle=False):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         test_err += err
@@ -99,8 +105,8 @@ def test(convnet,x_test,labels_test):
 
 if __name__=='__main__':
     try:
-        sharedSampleArray = sa.create("shm://samples2", (batch_size, 12, 64, 64), dtype='float32')
-        sharedLabelArray = sa.create("shm://labels2", batch_size, dtype='int32')
+        sharedSampleArray = sa.create("shm://samples2", (BATCH_SIZE, 12, 64, 64), dtype='float32')
+        sharedLabelArray = sa.create("shm://labels2", BATCH_SIZE, dtype='int32')
 
 
 
@@ -112,21 +118,33 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for oneshot_class in xrange(14,20):
+        for ONESHOT_CLASS in [18,19]:
 
-            loader = load_class.load(oneshot_class)
+            EXCLUDING_PARAM_PATH \
+                = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
+
+            loader = load_class.load(ONESHOT_CLASS)
             print(loader.get_oneshot())
 
             samples, labels, indices_train = loader.load_training_set()
             x_validate, labels_validate, indices_validate = loader.load_validation_set()
             x_test, labels_test, indices_test = loader.load_testing_set()
 
-            min_val_err = 200
+            val_indices_to_keep = indices_validate[0]
+            test_indices_to_keep = indices_test[0]
+            for i in xrange(1, 18):
+                val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
+                test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
-            ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
+            x_validate = x_validate[val_indices_to_keep]
+            labels_validate = labels_validate[val_indices_to_keep]
+            x_test = x_test[test_indices_to_keep]
+            labels_test = labels_test[test_indices_to_keep]
+
+            min_val_err = 20
+            last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
-            save_param_path = "{}convnet_params/excluding-{}".format(base_dir_path, oneshot_class)
 
             try:
                 q = mp.JoinableQueue()
@@ -134,9 +152,7 @@ if __name__=='__main__':
                 proc.daemon = True
                 proc.start()
 
-                backprops_per_epoch = 200
-                num_backprops = 3*20000 / backprops_per_epoch
-                for j in xrange(num_backprops):
+                for j in xrange(NUM_EPOCHS):
                     #Initialise new random permutation of data
                     #And load first batch of augmented samples
                     q.put('batch')
@@ -144,10 +160,10 @@ if __name__=='__main__':
                     train_err = 0
                     train_batches=0
                     start_time = time.time()
-                    print("\t--- BACKPROP {} to {} ---".format(j*backprops_per_epoch+1,j*backprops_per_epoch+backprops_per_epoch))
+
                     #wait for data
                     q.join()
-                    for i in xrange(backprops_per_epoch):
+                    for i in xrange(BACKPROPS_PER_EPOCH):
                         # Data kopieren om daarna te starten met augmentatie volgende batch
                         np.copyto(sample_batch,sharedSampleArray)
                         np.copyto(label_batch,sharedLabelArray)
@@ -157,20 +173,23 @@ if __name__=='__main__':
                         #trainen op de gekopieerde data
                         train_err += convnet.train(sample_batch, label_batch)
                         train_batches += 1
-                        print("\rtrain err:\t{:5.2f}".format(train_err / i), end="");sys.stdout.flush()
-                        print("\t{:5.0f}%".format(100.0 * (i+1) / backprops_per_epoch), end="");sys.stdout.flush()
+                        print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
+                                                    j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH),
+                                                    last_improvement,end="")
+                        print("train err: {:5.2f}".format(train_err / i), end="");sys.stdout.flush()
+                        print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
-                    train_loss = train_err / backprops_per_epoch
+                    train_loss = train_err / BACKPROPS_PER_EPOCH
                     val_loss, val_acc = validate(convnet,x_validate,labels_validate)
 
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
-                        convnet.save_param_values(save_param_path)
+                        convnet.save_param_values(EXCLUDING_PARAM_PATH)
+                        last_improvement=0
+                    else:
+                        last_improvement+=1
 
-                    print("\nval err:\t{:5.2f}\nval acc:\t{:5.2f}%"
-                          .format(val_loss,val_acc * 100.0))
-                    ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
             except KeyboardInterrupt:
                 print("Iteration stopped through KeyboardInterrupt")
@@ -178,16 +197,24 @@ if __name__=='__main__':
                 raise
             finally:
                 q.put('done')
-                if os.path.exists(save_param_path):
-                    convnet.load_param_values(save_param_path)
-                    test_acc = test(convnet,x_test,labels_test)
-                    print("test-acc:{:5.2f}%".format(test_acc * 100))
+                if os.path.exists(EXCLUDING_PARAM_PATH):
+                    convnet.load_param_values(EXCLUDING_PARAM_PATH)
 
-                directory = "{}output/excluding-{}/".format(base_dir_path, oneshot_class)
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-                ds.saveToArray(directory)
-                ds.saveToCsv(directory,"acc_loss")
+                test_acc = test(convnet, x_test, labels_test)
+                print("test-acc:{:5.2f}%".format(test_acc * 100))
+
+                OUTPUT_DIRECTORY = "{}output/{}/excluding-{}/".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
+
+                if not os.path.exists(OUTPUT_DIRECTORY):
+                    os.makedirs(OUTPUT_DIRECTORY)
+
+                y_predictions = convnet.test_output(x_test)
+                np.save("{}y_predictions".format(OUTPUT_DIRECTORY), y_predictions)
+
+                if not os.path.exists("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS)):
+                    open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
+                with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
+                    f.write(metrics.classification_report(labels_test, y_predictions))
 
     except:
         raise

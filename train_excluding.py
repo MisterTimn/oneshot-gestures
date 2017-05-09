@@ -26,7 +26,7 @@ if not os.path.exists(PARAM_PATH):
 
 
 TOTAL_BACKPROPS = 60000
-BACKPROPS_PER_EPOCH = 400
+BACKPROPS_PER_EPOCH = 1000
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
 NUM_CLASSES = 20
@@ -118,7 +118,7 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for ONESHOT_CLASS in [6, 7, 18, 19]:
+        for ONESHOT_CLASS in [7]:
 
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
@@ -142,6 +142,7 @@ if __name__=='__main__':
             labels_test = labels_test[test_indices_to_keep]
 
             min_val_err = 20
+            last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
 
@@ -172,8 +173,9 @@ if __name__=='__main__':
                         #trainen op de gekopieerde data
                         train_err += convnet.train(sample_batch, label_batch)
                         train_batches += 1
-                        print("\rBP {} - {}:  ".format(j * BACKPROPS_PER_EPOCH + 1,
-                                                  j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH),end="")
+                        print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
+                                                    j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH),
+                                                    last_improvement,end="")
                         print("train err: {:5.2f}".format(train_err / i), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
@@ -184,6 +186,9 @@ if __name__=='__main__':
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
                         convnet.save_param_values(EXCLUDING_PARAM_PATH)
+                        last_improvement=0
+                    else:
+                        last_improvement+=1
 
 
             except KeyboardInterrupt:
