@@ -174,8 +174,8 @@ if __name__=='__main__':
                         train_err += convnet.train(sample_batch, label_batch)
                         train_batches += 1
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
-                                                    j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH),
-                                                    last_improvement,end="")
+                                                    j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
+                                                    last_improvement),end="")
                         print("train err: {:5.2f}".format(train_err / i), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
