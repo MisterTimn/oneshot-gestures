@@ -29,7 +29,7 @@ if not os.path.exists(PARAM_DIRECTORY):
     os.makedirs(PARAM_DIRECTORY)
 
 TOTAL_BACKPROPS = 10000
-BACKPROPS_PER_EPOCH = 200
+BACKPROPS_PER_EPOCH = 100
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -115,107 +115,108 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for num_oneshot_samples in [1,2,3,4,5]:
-            for retrain_layers in [2]:
-                ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
-                precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
-                recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
+        for ONESHOT_CLASS in xrange(20):
+            for num_oneshot_samples in [1]:
+                for retrain_layers in [1]:
+                    ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
+                    precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
+                    recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
 
 
-                min_val_loss = 20
-                patience = 0
+                    min_val_loss = 20
+                    patience = 0
 
-                convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
+                    convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
+                    convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
 
-                save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
+                    save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
 
-                q.put('change_num_samples')
-                q.join()
-                q.put(num_oneshot_samples)
-                q.join()
+                    q.put('change_num_samples')
+                    q.join()
+                    q.put(num_oneshot_samples)
+                    q.join()
 
-                try:
-                    for j in xrange(NUM_EPOCHS):
-                        #Initialise new random permutation of data
-                        #And load first batch of augmented samples
-                        q.put('batch')
-                        end_epoch = False
-                        train_err = 0
-                        train_batches=0
-                        start_time = time.time()
-
-                        q.join()
-                        for i in xrange(BACKPROPS_PER_EPOCH):
-                            # Data kopieren om daarna te starten met augmentatie volgende batch
-                            np.copyto(sample_batch,sharedSampleArray)
-                            np.copyto(label_batch,sharedLabelArray)
-
+                    try:
+                        for j in xrange(NUM_EPOCHS):
+                            #Initialise new random permutation of data
+                            #And load first batch of augmented samples
                             q.put('batch')
-
-                            #trainen op de gekopieerde data
-                            train_err += convnet.train(sample_batch, label_batch)
-                            train_batches += 1
-                            print("\r{:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * BACKPROPS_PER_EPOCH + 1,
-                                                                        j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
-                                                                        100.0 * (i + 1) / BACKPROPS_PER_EPOCH), end="");
-                            sys.stdout.flush()
+                            end_epoch = False
+                            train_err = 0
+                            train_batches=0
+                            start_time = time.time()
 
                             q.join()
-                        train_loss = train_err / BACKPROPS_PER_EPOCH
-                        val_loss, val_acc, precision_score, recall_score = validate(convnet,x_validate,labels_validate)
-                        precision_list[j] = precision_score
-                        recall_list[j] = recall_score
+                            for i in xrange(BACKPROPS_PER_EPOCH):
+                                # Data kopieren om daarna te starten met augmentatie volgende batch
+                                np.copyto(sample_batch,sharedSampleArray)
+                                np.copyto(label_batch,sharedLabelArray)
 
-                        ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
+                                q.put('batch')
 
-                        if (val_loss < min_val_loss):
-                            min_val_loss = val_loss
-                            convnet.save_param_values(save_param_path)
-                            patience=0
-                        else:
-                            patience+=1
+                                #trainen op de gekopieerde data
+                                train_err += convnet.train(sample_batch, label_batch)
+                                train_batches += 1
+                                print("\r{:5.0f}-{:5.0f}:\t{:5.0f}%".format(j * BACKPROPS_PER_EPOCH + 1,
+                                                                            j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
+                                                                            100.0 * (i + 1) / BACKPROPS_PER_EPOCH), end="");
+                                sys.stdout.flush()
 
-                        print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
-                                                          j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
-                        sys.stdout.flush()
+                                q.join()
+                            train_loss = train_err / BACKPROPS_PER_EPOCH
+                            val_loss, val_acc, precision_score, recall_score = validate(convnet,x_validate,labels_validate)
+                            precision_list[j] = precision_score
+                            recall_list[j] = recall_score
 
-                        print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
-                              .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
+                            ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
-                        if patience == 5:
-                            print("No more improvement")
-                            # break
-                except KeyboardInterrupt:
-                    print("Iteration stopped through KeyboardInterrupt")
-                except:
-                    raise
-                finally:
-                    if os.path.exists(save_param_path):
-                        convnet.load_param_values(save_param_path)
+                            if (val_loss < min_val_loss):
+                                min_val_loss = val_loss
+                                convnet.save_param_values(save_param_path)
+                                patience=0
+                            else:
+                                patience+=1
 
-                    test_acc, test_acc, precision_score, recall_score = validate(convnet,x_test,labels_test)
-                    y_predictions = convnet.test_output(x_test)
-                    metrics.classification_report(labels_test,y_predictions)
+                            print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
+                                                              j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
+                            sys.stdout.flush()
 
-                    print("\ttest-acc:{:5.2f}%".format(test_acc * 100))
+                            print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
+                                  .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
-                    directory = "{}layers{}-samples{}/".format(OUTPUT_DIRECTORY, retrain_layers, num_oneshot_samples)
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
+                            if patience == 5:
+                                print("No more improvement")
+                                # break
+                    except KeyboardInterrupt:
+                        print("Iteration stopped through KeyboardInterrupt")
+                    except:
+                        raise
+                    finally:
+                        if os.path.exists(save_param_path):
+                            convnet.load_param_values(save_param_path)
 
-                    np.save("{}y_predictions".format(directory),y_predictions)
+                        test_acc, test_acc, precision_score, recall_score = validate(convnet,x_test,labels_test)
+                        y_predictions = convnet.test_output(x_test)
+                        metrics.classification_report(labels_test,y_predictions)
 
-                    ds.saveToArray(directory)
-                    ds.saveToCsv(directory,"acc_loss")
-                    np.save("{}precision".format(directory),precision_list)
-                    np.save("{}recall".format(directory),recall_list)
+                        print("\ttest-acc:{:5.2f}%".format(test_acc * 100))
 
-                    if not os.path.exists("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS)):
-                        open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
-                    with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
-                        f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
-                        f.write(metrics.classification_report(labels_test,y_predictions))
+                        directory = "{}layers{}-samples{}/".format(OUTPUT_DIRECTORY, retrain_layers, num_oneshot_samples)
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
+
+                        np.save("{}y_predictions".format(directory),y_predictions)
+
+                        ds.saveToArray(directory)
+                        ds.saveToCsv(directory,"acc_loss")
+                        np.save("{}precision".format(directory),precision_list)
+                        np.save("{}recall".format(directory),recall_list)
+
+                        if not os.path.exists("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS)):
+                            open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
+                        with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
+                            f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
+                            f.write(metrics.classification_report(labels_test,y_predictions))
 
 
     except:
