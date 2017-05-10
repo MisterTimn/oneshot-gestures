@@ -29,7 +29,7 @@ if not os.path.exists(PARAM_DIRECTORY):
     os.makedirs(PARAM_DIRECTORY)
 
 TOTAL_BACKPROPS = 5000
-BACKPROPS_PER_EPOCH = 50
+BACKPROPS_PER_EPOCH = 200
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -66,12 +66,9 @@ def worker_backprop(q):
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
-            print("Changing number of samples");sys.stdout.flush()
             q.task_done()
             indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
-            print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])));sys.stdout.flush()
         elif cmd == 'change_class':
-            print("Changing class");sys.stdout.flush()
             q.task_done()
             loader = load_class.load(int(q.get()))
             samples, labels, indices_train = loader.load_training_set()
@@ -125,7 +122,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(10,20):
+        for ONESHOT_CLASS in xrange(0,20):
             q.put('change_class')
             q.join()
             q.put(ONESHOT_CLASS)
@@ -140,7 +137,7 @@ if __name__=='__main__':
             if not os.path.exists(PARAM_DIRECTORY):
                 os.makedirs(PARAM_DIRECTORY)
 
-            for num_oneshot_samples in [1]:
+            for num_oneshot_samples in [200]:
                 for retrain_layers in [1]:
                     ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
                     precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
@@ -160,6 +157,9 @@ if __name__=='__main__':
                     q.join()
                     q.put(num_oneshot_samples)
                     q.join()
+
+                    print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])));
+                    sys.stdout.flush()
 
                     try:
                         for j in xrange(NUM_EPOCHS):
