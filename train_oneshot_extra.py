@@ -62,7 +62,7 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
         q.task_done()
         sys.stdout.flush()
 
-def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):
+def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
     assert len(inputs) == len(targets)
     indices=np.arange(len(inputs))
 
@@ -79,7 +79,7 @@ def validate(convnet, inputs, targets):
     precision_score = np.zeros((NUM_CLASSES))
     recall_score = np.zeros((NUM_CLASSES))
 
-    for batch in iterate_minibatches(inputs, targets, BATCH_SIZE, indices_validate, True):
+    for batch in iterate_minibatches(inputs, targets, BATCH_SIZE, True):
         inputs, targets = batch
         err, acc = convnet.validate(inputs, targets)
         val_err += err
@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(0,20):
+        for ONESHOT_CLASS in xrange(10,20):
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
