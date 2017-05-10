@@ -35,25 +35,15 @@ NUM_CLASSES = 20
 BATCH_SIZE = 32
 
 augmenter = aug.augmenter()
-loader = load_class.load(ONESHOT_CLASS)
 
-samples, labels, indices_train = loader.load_training_set()
-indices_train_oneshotclass = indices_train[NUM_CLASSES - 1]
-x_validate, labels_validate, indices_validate = loader.load_validation_set()
-x_test, labels_test, indices_test = loader.load_testing_set()
 
-def worker_backprop(q):
+def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
     #Data voor volgende iteratie ophalen en verwerken
     #Opslaan in shared memory
     done = False
     sharedSampleArray = sa.attach("shm://samples2")
     sharedLabelArray = sa.attach("shm://labels2")
     indices = np.empty(BATCH_SIZE, dtype='int32')
-
-    global samples, labels, indices_train
-    global indices_train_oneshotclass
-    global x_validate,labels_validate,indices_validate
-    global x_test, labels_test, indices_test
 
     while not done:
         cmd = q.get()
@@ -68,13 +58,6 @@ def worker_backprop(q):
         elif cmd == 'change_num_samples':
             q.task_done()
             indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
-        elif cmd == 'change_class':
-            q.task_done()
-            loader = load_class.load(int(q.get()))
-            samples, labels, indices_train = loader.load_training_set()
-            indices_train_oneshotclass = indices_train[NUM_CLASSES - 1]
-            x_validate, labels_validate, indices_validate = loader.load_validation_set()
-            x_test, labels_test, indices_test = loader.load_testing_set()
         q.task_done()
 
 def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):
@@ -110,11 +93,6 @@ if __name__=='__main__':
         sharedSampleArray = sa.create("shm://samples2", (BATCH_SIZE, 12, 64, 64), dtype='float32')
         sharedLabelArray = sa.create("shm://labels2", BATCH_SIZE, dtype='int32')
 
-
-        proc = mp.Process(target=worker_backprop, args=[q])
-        proc.daemon = True
-        proc.start()
-
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
@@ -123,9 +101,6 @@ if __name__=='__main__':
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
         for ONESHOT_CLASS in xrange(0,20):
-            q.put('change_class')
-            q.join()
-            q.put(ONESHOT_CLASS)
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -137,30 +112,39 @@ if __name__=='__main__':
             if not os.path.exists(PARAM_DIRECTORY):
                 os.makedirs(PARAM_DIRECTORY)
 
+            loader = load_class.load(ONESHOT_CLASS)
+            samples, labels, indices_train = loader.load_training_set()
+            indices_train_oneshotclass = indices_train[NUM_CLASSES - 1]
+            x_validate, labels_validate, indices_validate = loader.load_validation_set()
+            x_test, labels_test, indices_test = loader.load_testing_set()
+
+            proc = mp.Process(target=worker_backprop,
+                              args=[q,samples,labels,indices_train,indices_train_oneshotclass])
+            proc.daemon = True
+            proc.start()
+
             for num_oneshot_samples in [200]:
                 for retrain_layers in [1]:
+                    q.put('change_num_samples')
+                    q.join()
+                    q.put(num_oneshot_samples)
+
                     ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
+
                     precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                     recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
-
-
                     min_val_acc = 0
                     patience = 0
 
                     convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                    convnet.preload_excluding_model(EXCLUDING_PARAM_PATH)
+                    convnet.preload_excluding_model(path=EXCLUDING_PARAM_PATH)
 
                     save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
-
-                    q.join()
-                    q.put('change_num_samples')
-                    q.join()
-                    q.put(num_oneshot_samples)
-                    q.join()
 
                     print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])));
                     sys.stdout.flush()
 
+                    q.join()
                     try:
                         for j in xrange(NUM_EPOCHS):
                             #Initialise new random permutation of data
@@ -206,7 +190,7 @@ if __name__=='__main__':
                                                               j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
                             sys.stdout.flush()
 
-                            print("patience: {:3} val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
+                            print(" patience: {:3} val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                                   .format(patience,val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
                     except KeyboardInterrupt:
@@ -239,12 +223,12 @@ if __name__=='__main__':
                         with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
                             f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
                             f.write(metrics.classification_report(labels_test,y_predictions))
+                        q.put('done')
 
 
     except:
         raise
     finally:
-        q.put('done')
         sa.delete("samples2")
         sa.delete("labels2")
     print("End of program")
