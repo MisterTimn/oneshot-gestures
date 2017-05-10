@@ -14,7 +14,7 @@ import load_class
 from util.dataprocessing import DataSaver
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_VERS      =   "model-19x1-temp"
+MODEL_VERS      =   "model-19x1"
 MODEL_EXCLUDING =   "model-19"
 ONESHOT_CLASS   =   14
 
@@ -131,6 +131,17 @@ if __name__=='__main__':
             q.put('change_class')
             q.join()
             q.put(ONESHOT_CLASS)
+
+            OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
+            PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
+            EXCLUDING_PARAM_PATH \
+                = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
+
+            if not os.path.exists(OUTPUT_DIRECTORY):
+                os.makedirs(OUTPUT_DIRECTORY)
+            if not os.path.exists(PARAM_DIRECTORY):
+                os.makedirs(PARAM_DIRECTORY)
+
             for num_oneshot_samples in [1]:
                 for retrain_layers in [1]:
                     ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
