@@ -55,10 +55,6 @@ def worker_backprop(q):
     global x_validate,labels_validate,indices_validate
     global x_test, labels_test, indices_test
 
-    # indices_train[num_classes - 1] = indices_train_oneshotclass[:samples]
-
-    print(len(indices_train[NUM_CLASSES - 1]))
-
     while not done:
         cmd = q.get()
         if cmd == 'done':
@@ -70,10 +66,12 @@ def worker_backprop(q):
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
+            print("Changing number of samples");sys.stdout.flush()
             q.task_done()
             indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
-            print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
+            print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])));sys.stdout.flush()
         elif cmd == 'change_class':
+            print("Changing class");sys.stdout.flush()
             q.task_done()
             loader = load_class.load(int(q.get()))
             samples, labels, indices_train = loader.load_training_set()
