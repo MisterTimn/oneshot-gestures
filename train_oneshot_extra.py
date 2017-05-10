@@ -28,8 +28,8 @@ MODEL_EXCLUDING =   "model-19"
 # if not os.path.exists(PARAM_DIRECTORY):
 #     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 5000
-BACKPROPS_PER_EPOCH = 200
+TOTAL_BACKPROPS = 10000
+BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [200]:
+            for num_oneshot_samples in [1]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
