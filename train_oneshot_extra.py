@@ -16,17 +16,17 @@ from util.dataprocessing import DataSaver
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 MODEL_VERS      =   "model-19x1"
 MODEL_EXCLUDING =   "model-19"
-ONESHOT_CLASS   =   14
+# ONESHOT_CLASS   =   14
 
-OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
-PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
-EXCLUDING_PARAM_PATH   \
-                =   "{}convnet_params/{}/excluding-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
-
-if not os.path.exists(OUTPUT_DIRECTORY):
-    os.makedirs(OUTPUT_DIRECTORY)
-if not os.path.exists(PARAM_DIRECTORY):
-    os.makedirs(PARAM_DIRECTORY)
+# OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
+# PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
+# EXCLUDING_PARAM_PATH   \
+#                 =   "{}convnet_params/{}/excluding-{}".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS)
+#
+# if not os.path.exists(OUTPUT_DIRECTORY):
+#     os.makedirs(OUTPUT_DIRECTORY)
+# if not os.path.exists(PARAM_DIRECTORY):
+#     os.makedirs(PARAM_DIRECTORY)
 
 TOTAL_BACKPROPS = 5000
 BACKPROPS_PER_EPOCH = 200
@@ -58,7 +58,9 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
         elif cmd == 'change_num_samples':
             q.task_done()
             indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
+            print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
         q.task_done()
+        sys.stdout.flush()
 
 def iterate_minibatches(inputs, targets, batch_size, class_indices, shuffle=False):
     assert len(inputs) == len(targets)
@@ -141,8 +143,7 @@ if __name__=='__main__':
 
                     save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
 
-                    print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])));
-                    sys.stdout.flush()
+
 
                     q.join()
                     try:
