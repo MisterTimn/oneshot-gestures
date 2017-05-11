@@ -25,7 +25,7 @@ if not os.path.exists(PARAM_PATH):
 
 
 
-TOTAL_BACKPROPS = 60000
+TOTAL_BACKPROPS = 30000
 BACKPROPS_PER_EPOCH = 1000
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
@@ -118,7 +118,7 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for ONESHOT_CLASS in [7]:
+        for ONESHOT_CLASS in [0,7,19]:
 
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
@@ -142,6 +142,7 @@ if __name__=='__main__':
             labels_test = labels_test[test_indices_to_keep]
 
             min_val_err = 20
+            val_loss=20
             last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
@@ -176,12 +177,13 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f}".format(train_err / i), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val err: {:5.2f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
                     train_loss = train_err / BACKPROPS_PER_EPOCH
                     val_loss, val_acc = validate(convnet,x_validate,labels_validate)
+
 
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
