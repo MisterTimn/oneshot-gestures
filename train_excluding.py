@@ -16,7 +16,7 @@ from sklearn import metrics
 augmenter = aug.augmenter()
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_EXCLUDING =   "model-18"
+MODEL_EXCLUDING =   "model-19"
 
 PARAM_PATH   \
                 =   "{}convnet_params/{}/".format(BASE_DIR,MODEL_EXCLUDING)
@@ -118,7 +118,7 @@ if __name__=='__main__':
         global x_validate, labels_validate, indices_validate
         global x_test, labels_test, indices_test
 
-        for ONESHOT_CLASS in [0,7,19]:
+        for ONESHOT_CLASS in [0,7,8]:
 
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
