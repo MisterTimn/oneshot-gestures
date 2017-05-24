@@ -101,8 +101,8 @@ if __name__=='__main__':
             print(loader.get_oneshot())
 
             samples, labels, indices_train = loader.load_training_set()
-            x_validate, labels_validate, indices_validate = loader.load_validation_set()
-            x_test, labels_test, indices_test = loader.load_testing_set()
+            x_validate_orig, labels_validate_orig, indices_validate = loader.load_validation_set()
+            x_test_orig, labels_test_orig, indices_test = loader.load_testing_set()
 
             val_indices_to_keep = indices_validate[0]
             test_indices_to_keep = indices_test[0]
@@ -114,14 +114,19 @@ if __name__=='__main__':
             print(val_indices_to_keep[:100])
             print(len(test_indices_to_keep))
 
-            x_validate = x_validate[val_indices_to_keep]
+            x_validate = np.empty(len(val_indices_to_keep))
+            labels_validate = np.empty(len(val_indices_to_keep))
+            x_test = np.empty(len(test_indices_to_keep))
+            labels_test = np.empty(len(test_indices_to_keep))
+
+            np.copyto(x_validate,x_validate_orig[val_indices_to_keep])
             print(labels_validate[:100])
-            np.copyto(labels_validate,labels_validate[val_indices_to_keep])
+            np.copyto(labels_validate,labels_validate_orig[val_indices_to_keep])
             print(labels_validate[:100])
-            x_test = x_test[test_indices_to_keep]
+            np.copyto(x_test,x_test_orig[test_indices_to_keep])
             print(labels_test[:100])
-            labels_test = labels_test[test_indices_to_keep]
-            print(labels_validate[:100])
+            np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
+            print(labels_test[:100])
 
             min_val_err = 20
             val_loss=20
