@@ -70,6 +70,7 @@ def validate(convnet,x_validate,labels_validate):
         err, acc = convnet.validate(inputs, targets)
         val_err += err
         val_acc += acc
+        val_batches += 1
     return val_err/val_batches, val_acc/val_batches
 
 def test(convnet,x_test,labels_test):
@@ -126,7 +127,7 @@ if __name__=='__main__':
             print(labels_validate[:100])
 
             min_val_err = 20
-            val_loss=20
+            val_loss = 20
             val_acc = 0
             last_improvement = 0
 
