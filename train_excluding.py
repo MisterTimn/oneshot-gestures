@@ -110,8 +110,12 @@ if __name__=='__main__':
                 val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
                 test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
+            print(len(val_indices_to_keep))
+            print(len(test_indices_to_keep))
+
             x_validate = x_validate[val_indices_to_keep]
             labels_validate = labels_validate[val_indices_to_keep]
+            print(labels_validate[:100])
             x_test = x_test[test_indices_to_keep]
             labels_test = labels_test[test_indices_to_keep]
 

@@ -120,6 +120,9 @@ class DataPlotter:
         red_line =      mlines.Line2D([],[],color='red', marker='o',label="F1-score oneshot-class")
 
         plt.legend(handles=(blue_line,red_line))
+
+        ax=plt.subplot(111)
+        ax.set_xscale('log')
         plt.title(title)
         plt.show()
 

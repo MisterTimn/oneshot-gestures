@@ -1,9 +1,11 @@
 
 from __future__ import print_function
-print("start imports")
 import sys
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.lines as mlines
 
 import os
 import util.dataprocessing
@@ -37,7 +39,87 @@ EXCLUDING_PARAM_PATH   \
 #
 # dp.plotAccF1(y_test,y_predictions,x_labels,19,"Learning gesture 15, retrain level 1")
 
-y_pred = np.load("/home/jasper/oneshot-gestures/output/conf_matrix_data/all.npy")
-y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+def cm2inch(*tupl):
+    inch=0.393700787
+    if isinstance(tupl[0], tuple):
+        return tuple(i * inch for i in tupl[0])
+    else:
+        return tuple(i * inch for i in tupl)
 
-print(metrics.classification_report(y_test,y_pred))
+def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, title="F1 score"):
+
+    # plt.grid(True)
+    prec_scores = np.zeros(len(y_predictions))
+    recall_scores = np.zeros(len(y_predictions))
+
+    i = 0
+    for y_pred in y_predictions:
+        prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+        recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+
+        i += 1
+
+    plt.xlabel(r"Aantal samples")
+
+    plt.plot(x_labels,prec_scores, 'b')
+    plt.plot(x_labels,recall_scores, 'r')
+
+    plt.plot(x_labels,prec_scores, 'bo')
+    plt.plot(x_labels,recall_scores, 'ro')
+
+    plt.axhline(y=baseline_prec, xmin=0, xmax=1, linewidth=1, color='blue', linestyle=':', hold=None)
+    plt.axhline(y=baseline_rec, xmin=0, xmax=1, linewidth=1, color='red', linestyle=':', hold=None)
+
+    blue_line = mlines.Line2D([], [], color='blue', marker='o', label='precision')
+    red_line = mlines.Line2D([], [], color='red', marker='o', label="recall")
+    blue_dash = mlines.Line2D([], [], color='blue', linestyle=':', linewidth=1, label='precision baseline')
+    red_dash = mlines.Line2D([], [], color='red', linestyle=':', linewidth=1, label='recall baseline')
+
+
+    plt.legend(handles=(blue_line,blue_dash,red_line,red_dash))
+
+
+    ax = plt.subplot(111)
+    ax.set_xscale('log')
+    ax.set_xticks(x_labels)
+    ax.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    plt.title(title,size=12)
+    plt.tight_layout()
+
+
+
+def main():
+    mpl.rc('font', **{'size':'11','family': 'serif', 'sans-serif': ['Computer Modern']})
+    mpl.rc('text', usetex='true')
+
+
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
+    num_samples_array = [1,2,3,4,5,25,50,100,200]
+    y_predictions = np.empty((len(num_samples_array),2000))
+    i = 0
+
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load("{}output/model-19x1-temp/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR,num_samples))
+        i+=1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test,y_predictions,num_samples_array,0.97,0.95,"Oneshot gebaar 15")
+
+    plt.show()
+
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class14.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 200]
+    y_predictions = np.empty((len(num_samples_array), 2000))
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load("{}output/model-19x1-temp/class-14/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.56, 0.74, "Oneshot gebaar 14")
+    plt.show()
+
+
+
+
+if __name__ == "__main__":
+    main()
