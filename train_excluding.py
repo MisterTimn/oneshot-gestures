@@ -161,7 +161,7 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f} val err: {:5.2f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val acc: {:5.2f}".format(train_err / i,val_acc), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
