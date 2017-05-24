@@ -127,6 +127,7 @@ if __name__=='__main__':
 
             min_val_err = 20
             val_loss=20
+            val_acc = 0
             last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
