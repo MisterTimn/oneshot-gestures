@@ -24,7 +24,6 @@ if not os.path.exists(PARAM_PATH):
     os.makedirs(PARAM_PATH)
 
 
-
 TOTAL_BACKPROPS = 30000
 BACKPROPS_PER_EPOCH = 1000
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
@@ -45,18 +44,11 @@ def worker_backprop(q,samples,labels,indices_train):
         if cmd == 'done':
             done = True
         elif cmd == 'batch':
-            # classes = np.random.choice(class_choices,batch_size)
             classes = np.random.randint(NUM_CLASSES - 1, size=BATCH_SIZE)
             for i in xrange(BATCH_SIZE):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
             np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
             np.copyto(sharedLabelArray,labels[indices])
-        elif cmd == 'oneshot':
-            q.task_done()
-            class_choices = []
-            for class_num in xrange(20):
-                if class_num != NUM_CLASSES-1:
-                    class_choices.append(class_num)
         q.task_done()
 
 def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
@@ -68,17 +60,6 @@ def iterate_minibatches(inputs, targets, batch_size, shuffle=False):
     for start_idx in range(0, len(indices) - batch_size + 1, batch_size):
         excerpt = indices[start_idx:start_idx + batch_size]
         yield inputs[excerpt], targets[excerpt]
-
-def getClassAccuracy(targets, predictions, class_num):
-    assert(len(targets)==len(predictions))
-    predict_count = 0
-    class_count = 0
-    for i in xrange(len(targets)):
-        if(targets[i] == class_num):
-            class_count += 1
-            if(targets[i] == predictions[i]):
-                predict_count += 1
-    return predict_count, class_count
 
 def validate(convnet,x_validate,labels_validate):
     val_err = 0
@@ -108,15 +89,8 @@ if __name__=='__main__':
         sharedSampleArray = sa.create("shm://samples2", (BATCH_SIZE, 12, 64, 64), dtype='float32')
         sharedLabelArray = sa.create("shm://labels2", BATCH_SIZE, dtype='int32')
 
-
-
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
-
-        global loader
-        global samples, labels, indices_train
-        global x_validate, labels_validate, indices_validate
-        global x_test, labels_test, indices_test
 
         for ONESHOT_CLASS in [9,18,19]:
 
@@ -132,7 +106,7 @@ if __name__=='__main__':
 
             val_indices_to_keep = indices_validate[0]
             test_indices_to_keep = indices_test[0]
-            for i in xrange(1, 18):
+            for i in xrange(1, 19):
                 val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
                 test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
@@ -142,6 +116,7 @@ if __name__=='__main__':
             labels_test = labels_test[test_indices_to_keep]
 
             min_val_err = 20
+            val_loss=20
             last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
@@ -176,12 +151,13 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f}".format(train_err / i), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val err: {:5.2f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
                     train_loss = train_err / BACKPROPS_PER_EPOCH
                     val_loss, val_acc = validate(convnet,x_validate,labels_validate)
+
 
                     if (val_loss < min_val_err):
                         min_val_err = val_loss
