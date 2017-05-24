@@ -110,23 +110,17 @@ if __name__=='__main__':
                 val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
                 test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
-            print(len(val_indices_to_keep))
-            print(val_indices_to_keep[:100])
-            print(len(test_indices_to_keep))
-
-            x_validate = np.empty((len(val_indices_to_keep),12,64,64))
-            labels_validate = np.empty(len(val_indices_to_keep))
-            x_test = np.empty((len(test_indices_to_keep),12,64,64))
-            labels_test = np.empty(len(test_indices_to_keep))
+            x_validate = np.empty((len(val_indices_to_keep),12,64,64),dtype='float32')
+            labels_validate = np.empty(len(val_indices_to_keep),dtype='int32')
+            x_test = np.empty((len(test_indices_to_keep),12,64,64),dtype='float32')
+            labels_test = np.empty(len(test_indices_to_keep),dtype='int32')
 
             np.copyto(x_validate,x_validate_orig[val_indices_to_keep])
             print(labels_validate[:100])
             np.copyto(labels_validate,labels_validate_orig[val_indices_to_keep])
             print(labels_validate[:100])
             np.copyto(x_test,x_test_orig[test_indices_to_keep])
-            print(labels_test[:100])
             np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
-            print(labels_test[:100])
 
             min_val_err = 20
             val_loss=20
