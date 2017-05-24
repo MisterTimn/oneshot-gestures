@@ -123,6 +123,8 @@ if __name__=='__main__':
             np.copyto(x_test,x_test_orig[test_indices_to_keep])
             np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
 
+            print(labels_validate[:100])
+
             min_val_err = 20
             val_loss=20
             last_improvement = 0
