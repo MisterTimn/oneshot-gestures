@@ -110,6 +110,9 @@ if __name__=='__main__':
                 val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
                 test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
+            np.random.shuffle(val_indices_to_keep)
+            np.random.shuffle(test_indices_to_keep)
+
             x_validate = np.empty((len(val_indices_to_keep),12,64,64),dtype='float32')
             labels_validate = np.empty(len(val_indices_to_keep),dtype='int32')
             x_test = np.empty((len(test_indices_to_keep),12,64,64),dtype='float32')
