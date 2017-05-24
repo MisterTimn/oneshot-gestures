@@ -25,7 +25,7 @@ if not os.path.exists(PARAM_PATH):
 
 
 TOTAL_BACKPROPS = 30000
-BACKPROPS_PER_EPOCH = 200
+BACKPROPS_PER_EPOCH = 1000
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
 NUM_CLASSES = 20
@@ -123,8 +123,6 @@ if __name__=='__main__':
             np.copyto(labels_validate,labels_validate_orig[val_indices_to_keep])
             np.copyto(x_test,x_test_orig[test_indices_to_keep])
             np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
-
-            print(labels_validate[:100])
 
             min_val_err = 20
             val_loss = 20
