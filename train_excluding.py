@@ -119,6 +119,7 @@ if __name__=='__main__':
             print(labels_validate_orig[:100])
             np.copyto(labels_validate,labels_validate_orig[np.array(val_indices_to_keep)])
             print(labels_validate[:100])
+            print(x_validate_orig[val_indices_to_keep])
             np.copyto(x_test,x_test_orig[test_indices_to_keep])
             np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
 
