@@ -70,6 +70,7 @@ def validate(convnet,x_validate,labels_validate):
         err, acc = convnet.validate(inputs, targets)
         val_err += err
         val_acc += acc
+        val_batches += 1
     return val_err/val_batches, val_acc/val_batches
 
 def test(convnet,x_test,labels_test):
@@ -101,8 +102,8 @@ if __name__=='__main__':
             print(loader.get_oneshot())
 
             samples, labels, indices_train = loader.load_training_set()
-            x_validate, labels_validate, indices_validate = loader.load_validation_set()
-            x_test, labels_test, indices_test = loader.load_testing_set()
+            x_validate_orig, labels_validate_orig, indices_validate = loader.load_validation_set()
+            x_test_orig, labels_test_orig, indices_test = loader.load_testing_set()
 
             val_indices_to_keep = indices_validate[0]
             test_indices_to_keep = indices_test[0]
@@ -110,13 +111,22 @@ if __name__=='__main__':
                 val_indices_to_keep = np.concatenate((val_indices_to_keep, indices_validate[i]), axis=0)
                 test_indices_to_keep = np.concatenate((test_indices_to_keep, indices_test[i]), axis=0)
 
-            x_validate = x_validate[val_indices_to_keep]
-            labels_validate = labels_validate[val_indices_to_keep]
-            x_test = x_test[test_indices_to_keep]
-            labels_test = labels_test[test_indices_to_keep]
+            np.random.shuffle(val_indices_to_keep)
+            np.random.shuffle(test_indices_to_keep)
+
+            x_validate = np.empty((len(val_indices_to_keep),12,64,64),dtype='float32')
+            labels_validate = np.empty(len(val_indices_to_keep),dtype='int32')
+            x_test = np.empty((len(test_indices_to_keep),12,64,64),dtype='float32')
+            labels_test = np.empty(len(test_indices_to_keep),dtype='int32')
+
+            np.copyto(x_validate,x_validate_orig[val_indices_to_keep])
+            np.copyto(labels_validate,labels_validate_orig[val_indices_to_keep])
+            np.copyto(x_test,x_test_orig[test_indices_to_keep])
+            np.copyto(labels_test, labels_test_orig[test_indices_to_keep])
 
             min_val_err = 20
-            val_loss=20
+            val_loss = 20
+            val_acc = 0
             last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
@@ -151,7 +161,7 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f} val err: {:5.2f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val acc: {:5.2f}".format(train_err / i,val_acc), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
