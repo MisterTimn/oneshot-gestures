@@ -116,7 +116,7 @@ if __name__=='__main__':
 
             x_validate = x_validate[val_indices_to_keep]
             print(labels_validate[:100])
-            labels_validate = labels_validate[val_indices_to_keep]
+            np.copyto(labels_validate,labels_validate[val_indices_to_keep])
             print(labels_validate[:100])
             x_test = x_test[test_indices_to_keep]
             print(labels_test[:100])
