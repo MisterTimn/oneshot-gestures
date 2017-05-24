@@ -114,9 +114,10 @@ if __name__=='__main__':
             labels_validate = np.empty(len(val_indices_to_keep),dtype='int32')
             x_test = np.empty((len(test_indices_to_keep),12,64,64),dtype='float32')
             labels_test = np.empty(len(test_indices_to_keep),dtype='int32')
+            print(val_indices_to_keep.shape)
 
             np.copyto(x_validate,x_validate_orig[val_indices_to_keep])
-            print(labels_validate[:100])
+            print(labels_validate_orig[:100])
             np.copyto(labels_validate,labels_validate_orig[val_indices_to_keep])
             print(labels_validate[:100])
             np.copyto(x_test,x_test_orig[test_indices_to_keep])
