@@ -28,7 +28,7 @@ MODEL_EXCLUDING =   "model-19"
 # if not os.path.exists(PARAM_DIRECTORY):
 #     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 10000
+TOTAL_BACKPROPS = 20000
 BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(9,18,19):
+        for ONESHOT_CLASS in xrange(10,20):
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
