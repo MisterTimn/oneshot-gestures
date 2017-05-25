@@ -14,7 +14,7 @@ import load_class
 from util.dataprocessing import DataSaver
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_VERS      =   "model-19x1-temp"
+MODEL_VERS      =   "model-19x1"
 MODEL_EXCLUDING =   "model-19"
 ONESHOT_CLASS   =   15
 
@@ -216,7 +216,7 @@ if __name__=='__main__':
                             open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
                         with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
                             f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
-                            f.write("total backprops: {}".Format(TOTAL_BACKPROPS))
+                            f.write("total backprops: {}".format(TOTAL_BACKPROPS))
                             f.write(metrics.classification_report(labels_test,y_predictions))
 
 
