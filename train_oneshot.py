@@ -115,7 +115,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(20):
+        for ONESHOT_CLASS in [0,7,8,9,18,19]:
             for num_oneshot_samples in [1]:
                 for retrain_layers in [1]:
                     ds = DataSaver(('train_loss', 'val_loss', 'val_acc', 'dt'))
@@ -184,7 +184,7 @@ if __name__=='__main__':
                             print(" val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                                   .format(val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
-                            if patience == 5:
+                            if patience == 10:
                                 print("No more improvement")
                                 # break
                     except KeyboardInterrupt:
@@ -216,6 +216,7 @@ if __name__=='__main__':
                             open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
                         with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
                             f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
+                            f.write("total backprops: {}".Format(TOTAL_BACKPROPS))
                             f.write(metrics.classification_report(labels_test,y_predictions))
 
 
