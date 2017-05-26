@@ -1,5 +1,24 @@
-WARNING (theano.tensor.blas): We did not found a dynamic library into the library_dir of the library we use for blas. If you use ATLAS, make sure to compile it with dynamics library.
-/usr/local/lib/python2.7/dist-packages/sklearn/metrics/classification.py:1113: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples.
-  'precision', 'predicted', average, warn_for)
-/usr/local/lib/python2.7/dist-packages/sklearn/metrics/classification.py:1115: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples.
-  'recall', 'true', average, warn_for)
+WARNING (theano.sandbox.cuda): The cuda backend is deprecated and will be removed in the next release.  Please switch to the gpuarray backend. You can get more information about how to switch at this URL:
+ https://github.com/Theano/Theano/wiki/Converting-to-the-new-gpu-back-end%28gpuarray%29
+
+ERROR (theano.sandbox.cuda): ERROR: Not using GPU. Initialisation of device 1 failed:
+cublasCreate() returned this error 'the CUDA Runtime initialization failed'
+WARNING (theano.sandbox.cuda): The cuda backend is deprecated and will be removed in the next release.  Please switch to the gpuarray backend. You can get more information about how to switch at this URL:
+ https://github.com/Theano/Theano/wiki/Converting-to-the-new-gpu-back-end%28gpuarray%29
+
+ERROR (theano.sandbox.cuda): ERROR: Not using GPU. Initialisation of device gpu failed:
+Not able to select available GPU from 2 cards (all CUDA-capable devices are busy or unavailable).
+Traceback (most recent call last):
+  File "/home/jveessen/oneshot-gestures/train_oneshot_extra_2.py", line 12, in <module>
+    import convnet_19x1 as cnn
+  File "/home/jveessen/oneshot-gestures/convnet_19x1.py", line 2, in <module>
+    import theano
+  File "/usr/local/lib/python2.7/dist-packages/theano/__init__.py", line 115, in <module>
+    theano.sandbox.cuda.tests.test_driver.test_nvidia_driver1()
+  File "/usr/local/lib/python2.7/dist-packages/theano/sandbox/cuda/tests/test_driver.py", line 30, in test_nvidia_driver1
+    A = cuda.shared_constructor(a)
+  File "/usr/local/lib/python2.7/dist-packages/theano/sandbox/cuda/var.py", line 166, in float32_shared_constructor
+    enable_cuda=False)
+  File "/usr/local/lib/python2.7/dist-packages/theano/sandbox/cuda/__init__.py", line 586, in use
+    cuda_ndarray.cuda_ndarray.select_a_gpu()
+RuntimeError: ('Not able to select available GPU from 2 cards (all CUDA-capable devices are busy or unavailable).', 'You asked to force this device and it failed. No fallback to the cpu or other gpu device.')
