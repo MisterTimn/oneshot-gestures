@@ -16,7 +16,7 @@ from sklearn import metrics
 augmenter = aug.augmenter()
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_EXCLUDING =   "model-19"
+MODEL_EXCLUDING =   "model-19-redo"
 
 PARAM_PATH   \
                 =   "{}convnet_params/{}/".format(BASE_DIR,MODEL_EXCLUDING)
@@ -24,7 +24,7 @@ if not os.path.exists(PARAM_PATH):
     os.makedirs(PARAM_PATH)
 
 
-TOTAL_BACKPROPS = 30000
+TOTAL_BACKPROPS = 60000
 BACKPROPS_PER_EPOCH = 1000
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
@@ -93,10 +93,13 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
-        for ONESHOT_CLASS in [9,18,19]:
+        for ONESHOT_CLASS in xrange(5,10):
 
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
+            if not os.path.exists(EXCLUDING_PARAM_PATH):
+                os.makedirs(EXCLUDING_PARAM_PATH)
+
 
             loader = load_class.load(ONESHOT_CLASS)
             print(loader.get_oneshot())
@@ -161,7 +164,7 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f} val acc: {:5.2f}".format(train_err / i,val_acc), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val acc: {:5.2f} improv: {:3f}".format(train_err / i,val_acc,last_improvement), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()
@@ -176,6 +179,8 @@ if __name__=='__main__':
                     else:
                         last_improvement+=1
 
+                    if(last_improvement>10):
+                        break
 
             except KeyboardInterrupt:
                 print("Iteration stopped through KeyboardInterrupt")
@@ -200,6 +205,8 @@ if __name__=='__main__':
                 if not os.path.exists("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS)):
                     open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
                 with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
+                    f.write("excluding test acc: {}\n".format(1.0 * test_acc))
+                    f.write("total backprops: {}".format(TOTAL_BACKPROPS))
                     f.write(metrics.classification_report(labels_test, y_predictions))
 
     except:

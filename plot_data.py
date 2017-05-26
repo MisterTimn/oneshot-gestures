@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.lines as mlines
+import math
 
 import os
 import util.dataprocessing
@@ -45,6 +46,14 @@ def cm2inch(*tupl):
         return tuple(i * inch for i in tupl[0])
     else:
         return tuple(i * inch for i in tupl)
+
+def sigmoid(x):
+    a = []
+    for item in x:
+        a.append(1/(1+math.exp(-item)))
+    return a
+
+
 
 def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, title="F1 score"):
 
@@ -94,18 +103,40 @@ def main():
     mpl.rc('text', usetex='true')
 
 
+    xaxis = np.arange(-2,2,0.1)
+    sig=sigmoid(xaxis)
+
+    tanh=np.tanh(xaxis)
+    relu=xaxis*(xaxis>0)
+
+
+    plt.figure(figsize=cm2inch(9, 7))
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$a(x)$')
+    plt.yticks([-1,0,1,2])
+    plt.tick_params(axis='both', which='major', labelsize=8)
+    plt.tick_params(axis='both', which='minor', labelsize=8)
+    plt.plot(xaxis,sig,'C0--')
+    plt.plot(xaxis,tanh,'C1:')
+    plt.plot(xaxis,relu,'C2')
+
+    plt.legend(handles=(mlines.Line2D([], [], color='C0', linestyle='--', label=r'$Sigmo\ddot{\imath}de$'),
+                        mlines.Line2D([], [], color='C1', linestyle=':', label=r'$Tanh$'),
+                        mlines.Line2D([], [], color='C2',  label=r'$ReLU$')))
+    plt.tight_layout()
+    plt.show()
+
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
     num_samples_array = [1,2,3,4,5,25,50,100,200]
     y_predictions = np.empty((len(num_samples_array),2000))
     i = 0
-
     for num_samples in num_samples_array:
         y_predictions[i] = np.load("{}output/model-19x1-temp/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR,num_samples))
         i+=1
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test,y_predictions,num_samples_array,0.97,0.95,"Oneshot gebaar 15")
 
-    plt.show()
+    # plt.show()
 
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class14.npy")
     num_samples_array = [1, 2, 3, 4, 5, 200]
@@ -116,7 +147,8 @@ def main():
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.56, 0.74, "Oneshot gebaar 14")
-    plt.show()
+
+    # plt.show()
 
 
 
