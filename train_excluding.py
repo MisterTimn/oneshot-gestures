@@ -93,12 +93,12 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
-        for ONESHOT_CLASS in xrange(5):
+        for ONESHOT_CLASS in xrange(10,15):
 
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
-            if not os.path.exists(EXCLUDING_PARAM_PATH):
-                os.makedirs(EXCLUDING_PARAM_PATH)
+            if not os.path.exists("{}convnet_params/{}".format(BASE_DIR, MODEL_EXCLUDING)):
+                os.makedirs("{}convnet_params/{}".format(BASE_DIR, MODEL_EXCLUDING))
 
 
             loader = load_class.load(ONESHOT_CLASS)
