@@ -14,8 +14,8 @@ import load_class
 from util.dataprocessing import DataSaver
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
-MODEL_VERS      =   "model-19x1"
-MODEL_EXCLUDING =   "model-19"
+MODEL_VERS      =   "model-19x1-redo"
+MODEL_EXCLUDING =   "model-19-redo"
 # ONESHOT_CLASS   =   14
 
 # OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
@@ -204,7 +204,6 @@ if __name__=='__main__':
 
                         test_acc, test_acc, precision_score, recall_score = validate(convnet,x_test,labels_test)
                         y_predictions = convnet.test_output(x_test)
-                        metrics.classification_report(labels_test,y_predictions)
 
                         print("\ttest-acc:{:5.2f}%".format(test_acc * 100))
 
