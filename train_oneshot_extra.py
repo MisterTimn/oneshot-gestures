@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1,5]:
+            for num_oneshot_samples in [5]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -204,6 +204,7 @@ if __name__=='__main__':
 
                         test_acc, test_acc, precision_score, recall_score = validate(convnet,x_test,labels_test)
                         y_predictions = convnet.test_output(x_test)
+                        metrics.classification_report(labels_test,y_predictions)
 
                         print("\ttest-acc:{:5.2f}%".format(test_acc * 100))
 
@@ -222,9 +223,9 @@ if __name__=='__main__':
                             open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
                         with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
                             f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
-                            f.write("total backprops: {}\n".format(TOTAL_BACKPROPS))
+                            f.write("total backprops: \n{}".format(TOTAL_BACKPROPS))
                             f.write("patience: {}\n".format(patience))
-                            f.write(metrics.classification_report(labels_test,y_predictions,digits=4))
+                            f.write(metrics.classification_report(labels_test, y_predictions, digits=4))
                         q.put('done')
 
 
