@@ -29,7 +29,7 @@ MODEL_EXCLUDING =   "model-19"
 #     os.makedirs(PARAM_DIRECTORY)
 
 TOTAL_BACKPROPS = 20000
-BACKPROPS_PER_EPOCH = 500
+BACKPROPS_PER_EPOCH = 250
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(10):
+        for ONESHOT_CLASS in xrange(5):
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1]:
+            for num_oneshot_samples in [1,5]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -223,8 +223,9 @@ if __name__=='__main__':
                             open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'w').close()
                         with open("{}test-acc.txt".format(OUTPUT_DIRECTORY, ONESHOT_CLASS), 'ab') as f:
                             f.write("layers{};samples{};{}\n".format(retrain_layers, num_oneshot_samples, 1.0 * test_acc))
-                            f.write("total backprops: {}".format(TOTAL_BACKPROPS))
-                            f.write(metrics.classification_report(labels_test,y_predictions))
+                            f.write("total backprops: {}\n".format(TOTAL_BACKPROPS))
+                            f.write("patience: {}\n".format(patience))
+                            f.write(metrics.classification_report(labels_test,y_predictions,digits=4))
                         q.put('done')
 
 
