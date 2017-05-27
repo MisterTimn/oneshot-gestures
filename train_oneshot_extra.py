@@ -193,8 +193,6 @@ if __name__=='__main__':
 
                             print(" patience: {:3} val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
                                   .format(patience,val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
-                            if (patience > 20):
-                                break
 
                     except KeyboardInterrupt:
                         print("Iteration stopped through KeyboardInterrupt")
