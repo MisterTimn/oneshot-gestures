@@ -41,8 +41,8 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
     #Data voor volgende iteratie ophalen en verwerken
     #Opslaan in shared memory
     done = False
-    sharedSampleArray = sa.attach("shm://samples")
-    sharedLabelArray = sa.attach("shm://labels")
+    sharedSampleArray = sa.attach("shm://samples2")
+    sharedLabelArray = sa.attach("shm://labels2")
     indices = np.empty(BATCH_SIZE, dtype='int32')
 
     while not done:
@@ -92,8 +92,8 @@ def validate(convnet, inputs, targets):
 if __name__=='__main__':
     q = mp.JoinableQueue()
     try:
-        sharedSampleArray = sa.create("shm://samples", (BATCH_SIZE, 12, 64, 64), dtype='float32')
-        sharedLabelArray = sa.create("shm://labels", BATCH_SIZE, dtype='int32')
+        sharedSampleArray = sa.create("shm://samples2", (BATCH_SIZE, 12, 64, 64), dtype='float32')
+        sharedLabelArray = sa.create("shm://labels2", BATCH_SIZE, dtype='int32')
 
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(15,19):
+        for ONESHOT_CLASS in xrange(15,20):
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -232,6 +232,6 @@ if __name__=='__main__':
     except:
         raise
     finally:
-        sa.delete("samples")
-        sa.delete("labels")
+        sa.delete("samples2")
+        sa.delete("labels2")
     print("End of program")
