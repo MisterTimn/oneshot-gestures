@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.lines as mlines
+
 import math
 
 import os
@@ -101,15 +102,98 @@ def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, ti
 def main():
     mpl.rc('font', **{'size':'11','family': 'serif', 'sans-serif': ['Computer Modern']})
     mpl.rc('text', usetex='true')
+    mpl.rc('lines',linewidth=1)
+    # mpl.rc('lines',markersize=4)
+
+    show_all=True
+
+    # Vergelijken klasse precision recall
+    # plt.figure(figsize=cm2inch(9,7))
+
+    OS_1 = mlines.Line2D([], [], color='blue', marker='.', label='1 sample')
+    OS_10 = mlines.Line2D([], [], color='red', marker='.', label="10 samples")
+    base = mlines.Line2D([], [], color='green', linestyle=':',marker='.', label='baseline')
+    recall_line = mlines.Line2D([], [], color='red', marker='.', label='recall')
+    prec_line = mlines.Line2D([], [], color='blue', marker='.', label='prec')
 
 
+
+    fig, (ax0, ax1) = plt.subplots(nrows=2)
+    fig2,(ax3,ax4) = plt.subplots(nrows=2)
+
+
+    ax0.legend(handles=(OS_1,OS_10,base))
+    ax0.set_ylabel("Precision")
+    ax0.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax0.set_xticks(xrange(20))
+    ax0.set_xticklabels(xrange(20))
+
+    ax1.set_ylabel("Recall")
+    ax1.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax1.set_xticks(xrange(20))
+    ax1.set_xticklabels(xrange(20))
+    ax1.set_xlabel("Klassenummer")
+
+
+    ax3.set_color_cycle(['r', 'b', 'g', 'y'])
+    ax3.set_yticks(np.arange(-0.2, 1, 0.1))
+    ax3.set_yticklabels(np.arange(-0.2, 1, 0.1))
+    ax3.set_xticks(xrange(15))
+
+
+    ax4.set_color_cycle(['r', 'b', 'g', 'y'])
+    ax4.set_yticks(np.arange(-0.2, 1, 0.1))
+    ax4.set_yticklabels(np.arange(-0.2, 1, 0.1))
+    ax4.set_xticks(xrange(15))
+
+    ax4.set_xlabel("Klassenummer")
+
+    y_pred=np.load("/home/jasper/oneshot-gestures/output/conf_matrix_data/all.npy")
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    all_prec=metrics.precision_score(y_test,y_pred,average=None)
+    all_recall=metrics.recall_score(y_test,y_pred,average=None)
+
+    for num_samples in [1,10]:
+
+        prec_scores = np.empty(20)
+        recall_scores = np.empty(20)
+        i = 0
+        for class_num in xrange(20):
+            y_test=np.load("/home/jasper/oneshot-gestures/output/y_tests/class{}.npy".format(class_num))
+            y_pred=np.load("/home/jasper/oneshot-gestures/output/model-19x1-redo/class-{}/layers1-samples{}/y_predictions.npy".format(class_num,num_samples))
+            print(metrics.precision_score(y_test,y_pred,labels=[19],average=None))
+            prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+            recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+            i=i+1
+        ax0.plot(xrange(20),prec_scores,)
+        ax0.plot(xrange(20), prec_scores, '.')
+        ax1.plot(xrange(20),recall_scores,label="recall score")
+        ax1.plot(xrange(20), recall_scores, '.')
+
+        if(num_samples==1):
+            ax3.plot(xrange(20),all_recall[:20]-recall_scores,'.')
+            ax3.plot(xrange(20), all_prec[:20]-prec_scores, '.')
+        else:
+            ax4.plot(xrange(20), all_recall[:20] - recall_scores, '.')
+            ax4.plot(xrange(20), all_prec[:20] - prec_scores, '.')
+
+
+    ax0.plot(xrange(20),all_prec,':')
+    ax0.plot(xrange(20), all_prec,'.')
+    ax1.plot(xrange(20),all_recall,':')
+    ax1.plot(xrange(20), all_recall,'.')
+
+
+    # plt.tight_layout()
+    # plt.show()
+    if (show_all):
+        plt.show()
+
+    # Plot van activatiefuncties
     xaxis = np.arange(-2,2,0.1)
     sig=sigmoid(xaxis)
-
     tanh=np.tanh(xaxis)
     relu=xaxis*(xaxis>0)
-
-
     plt.figure(figsize=cm2inch(9, 7))
     plt.xlabel(r'$x$')
     plt.ylabel(r'$a(x)$')
@@ -124,7 +208,8 @@ def main():
                         mlines.Line2D([], [], color='C1', linestyle=':', label=r'$Tanh$'),
                         mlines.Line2D([], [], color='C2',  label=r'$ReLU$')))
     plt.tight_layout()
-    plt.show()
+    if (show_all):
+        plt.show()
 
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
     num_samples_array = [1,2,3,4,5,25,50,100,200]
@@ -135,8 +220,8 @@ def main():
         i+=1
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test,y_predictions,num_samples_array,0.97,0.95,"Oneshot gebaar 15")
-
-    # plt.show()
+    if(show_all):
+        plt.show()
 
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class14.npy")
     num_samples_array = [1, 2, 3, 4, 5, 200]
@@ -147,8 +232,10 @@ def main():
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.56, 0.74, "Oneshot gebaar 14")
+    if(show_all):
+        plt.show()
 
-    # plt.show()
+
 
 
 
