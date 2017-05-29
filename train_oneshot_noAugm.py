@@ -53,7 +53,7 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
             classes = np.random.randint(NUM_CLASSES, size=BATCH_SIZE)
             for i in xrange(BATCH_SIZE):
                 indices[i] = indices_train[classes[i]][np.random.randint(len(indices_train[classes[i]]))]
-            np.copyto(sharedSampleArray,augmenter.transfMatrix(samples[indices]))
+            np.copyto(sharedSampleArray,samples[indices])
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
             q.task_done()
