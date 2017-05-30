@@ -36,7 +36,7 @@ def getParamExcludingPath(class_num):
     return "{}convnet_params/model-19/excluding-{}".format(base_dir_path,class_num)
 
 def main():
-    class_num = 15
+    class_num = 19
     BASE_DIR = "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 
     load = load_class.load(19)
@@ -52,7 +52,7 @@ def main():
     np.save("{}output/y_pred_naive/y_predictions-0".format(BASE_DIR),y_pred)
 
     for num_samples in [1,2,5,10,25,50,100,200]:
-        for num_layers_retrained in [1]:
+        for num_layers_retrained in [2]:
             convnet.load_param_values("{}convnet_params/naive_model/param-oneshot{}-layers{}-samples{}"\
                 .format(BASE_DIR,class_num, num_layers_retrained, num_samples))
             # y_pred = convnet.test_output(x_test)
