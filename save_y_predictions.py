@@ -55,10 +55,10 @@ def main():
         for num_layers_retrained in [1]:
             convnet.load_param_values("{}convnet_params/naive_model/param-oneshot{}-layers{}-samples{}"\
                 .format(BASE_DIR,class_num, num_layers_retrained, num_samples))
-            y_pred = convnet.test_output(x_test)
-            print(metrics.classification_report(labels_test,y_pred))
-
-            np.save("{}output/y_pred_naive/y_predictions-{}".format(BASE_DIR,num_samples), y_pred)
+            # y_pred = convnet.test_output(x_test)
+            # print(metrics.classification_report(labels_test,y_pred))
+            #
+            # np.save("{}output/y_pred_naive/y_predictions-{}".format(BASE_DIR,num_samples), y_pred)
 
 
 

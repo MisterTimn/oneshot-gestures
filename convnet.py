@@ -104,8 +104,8 @@ class convnet(object):
         with open(path, 'rb') as f:
             param_values = pickle.load(f)
         x=np.array(param_values)
-        print(x.shape)
-        nn.layers.set_all_param_values(self.network,param_values)
+        print(param_values)
+        #nn.layers.set_all_param_values(self.network,param_values)
 
     def train(self, x_batch, y_batch):
         return self.train(x_batch, y_batch)
