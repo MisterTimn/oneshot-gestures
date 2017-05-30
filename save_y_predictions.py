@@ -41,7 +41,7 @@ def main():
 
     load = load_class.load(19)
     x_test, labels_test, indices_test = load.load_testing_set()
-    convnet = cnn.convnet_oneshot()
+    convnet = cnn.convnet()
 
     convnet.load_param_values(
         "{}convnet_params/naive_model/param-excl{}".format(BASE_DIR,class_num))
