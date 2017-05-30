@@ -52,9 +52,6 @@ class convnet(object):
         L2 = 0.0001
         l2_penalty = nn.regularization.regularize_network_params(self.network, nn.regularization.l2)
         # l1_penalty = nn.regularization.regularize_network_params(self.network, nn.regularization.l1)
-        # params = nn.layers.get_all_params(self.network)
-        # self.L1_term = sum(T.sum(T.abs_(p)) for p in params)
-        # self.L2_term = sum(T.sum(p**2) for p in params)
 
         prediction  = nn.layers.get_output(self.network)
         loss = nn.objectives.categorical_crossentropy(prediction, target_var)
@@ -106,7 +103,8 @@ class convnet(object):
     def load_param_values(self, path):
         with open(path, 'rb') as f:
             param_values = pickle.load(f)
-        nn.layers.set_all_param_values(self.network,param_values,allow_input_downcast=True)
+        print(param_values.shape)
+        nn.layers.set_all_param_values(self.network,param_values)
 
     def train(self, x_batch, y_batch):
         return self.train(x_batch, y_batch)
