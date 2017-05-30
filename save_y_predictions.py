@@ -7,7 +7,7 @@ import time
 print("Importing load_class")
 import load_class
 print("Importing convnet")
-import convnet as cnn
+import convnet_oneshot as cnn
 import os
 
 from sklearn import metrics
