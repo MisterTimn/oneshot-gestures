@@ -107,14 +107,101 @@ def main():
 
     show_all=True
 
+    augm = mlines.Line2D([], [], color='red', marker='.', label='Met augmentatie')
+    noaugm = mlines.Line2D([], [], color='blue', marker='.', label="Zonder augmentatie")
+    base = mlines.Line2D([], [], color='green', linestyle=':',marker='.', label='baseline')
+    recall_line = mlines.Line2D([], [], color='red', linestyle='', marker='.', label='recall')
+    prec_line = mlines.Line2D([], [], color='blue', linestyle='', marker='.', label='prec')
+
+
+    fig, (ax0, ax1) = plt.subplots(nrows=2)
+    fig2,(ax3,ax4) = plt.subplots(nrows=2)
+
+
+    ax0.legend(handles=(augm,noaugm))
+    ax0.set_ylabel("Precision")
+    ax0.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax0.set_xticks(xrange(20))
+    ax0.set_xticklabels(xrange(20))
+
+    ax1.set_ylabel("Recall")
+    ax1.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax1.set_xticks(xrange(20))
+    ax1.set_xticklabels(xrange(20))
+    ax1.set_xlabel("Klassenummer")
+
+    ax3.legend(handles=(prec_line,recall_line))
+    ax3.set_ylabel("Precision")
+    ax3.set_color_cycle(['r', 'b', 'g', 'y'])
+    ax3.set_xticks(xrange(20))
+    ax3.set_xticklabels(xrange(20))
+
+    ax4.set_ylabel("Recall")
+    ax4.set_color_cycle(['r', 'b', 'g', 'y'])
+    ax4.set_xticks(xrange(20))
+    ax4.set_xticklabels(xrange(20))
+    ax4.set_xlabel("Klassenummer")
+
+    y_pred=np.load("/home/jasper/oneshot-gestures/output/conf_matrix_data/all.npy")
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    all_prec=metrics.precision_score(y_test,y_pred,average=None)
+    all_recall=metrics.recall_score(y_test,y_pred,average=None)
+
+    for num_samples in [1]:
+
+        prec_scores = np.empty(20)
+        recall_scores = np.empty(20)
+        prec_scores_noaugm = np.empty(20)
+        recall_scores_noaugm = np.empty(20)
+        i = 0
+        for class_num in xrange(2,20):
+            y_test=np.load("/home/jasper/oneshot-gestures/output/y_tests/class{}.npy".format(class_num))
+            y_pred=np.load("/home/jasper/oneshot-gestures/output/model-19x1-redo/class-{}/layers1-samples{}/y_predictions.npy".format(class_num,num_samples))
+            y_pred2=np.load("/home/jasper/oneshot-gestures/output/model-19x1-redo/class-{}/layers1-samples{}noaugm/y_predictions.npy".format(class_num,num_samples))
+            prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+            recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+            prec_scores_noaugm[i] = metrics.precision_score(y_test, y_pred2, labels=[19], average=None)
+            recall_scores_noaugm[i] = metrics.recall_score(y_test, y_pred2, labels=[19], average=None)
+            i=i+1
+        if(num_samples==1):
+            ax0.plot(xrange(20), prec_scores,)
+            ax0.plot(xrange(20), prec_scores, '.')
+            ax0.plot(xrange(20), prec_scores_noaugm, )
+            ax0.plot(xrange(20), prec_scores_noaugm, '.')
+
+            ax1.plot(xrange(20), recall_scores)
+            ax1.plot(xrange(20), recall_scores, '.')
+            ax1.plot(xrange(20), recall_scores_noaugm, )
+            ax1.plot(xrange(20), recall_scores_noaugm, '.')
+
+        elif(num_samples==10):
+            ax3.plot(xrange(20), prec_scores, )
+            ax3.plot(xrange(20), prec_scores, '.')
+            ax3.plot(xrange(20), prec_scores_noaugm, )
+            ax3.plot(xrange(20), prec_scores_noaugm, '.')
+
+            ax4.plot(xrange(20), recall_scores)
+            ax4.plot(xrange(20), recall_scores, '.')
+            ax4.plot(xrange(20), recall_scores_noaugm, )
+            ax4.plot(xrange(20), recall_scores_noaugm, '.')
+
+    # plt.tight_layout()
+    # plt.show()
+    if (show_all):
+        plt.show()
+
+
+    #----------------------------#
+    #     Alle klassen P+R       #
+    #----------------------------#
     # Vergelijken klasse precision recall
     # plt.figure(figsize=cm2inch(9,7))
 
-    OS_1 = mlines.Line2D([], [], color='blue', marker='.', label='1 sample')
-    OS_10 = mlines.Line2D([], [], color='red', marker='.', label="10 samples")
+    OS_1 = mlines.Line2D([], [], color='red', marker='.', label='1 sample')
+    OS_10 = mlines.Line2D([], [], color='blue', marker='.', label="10 samples")
     base = mlines.Line2D([], [], color='green', linestyle=':',marker='.', label='baseline')
-    recall_line = mlines.Line2D([], [], color='red', marker='.', label='recall')
-    prec_line = mlines.Line2D([], [], color='blue', marker='.', label='prec')
+    recall_line = mlines.Line2D([], [], color='red', linestyle='', marker='.', label='recall')
+    prec_line = mlines.Line2D([], [], color='blue', linestyle='', marker='.', label='prec')
 
 
 
@@ -134,17 +221,18 @@ def main():
     ax1.set_xticklabels(xrange(20))
     ax1.set_xlabel("Klassenummer")
 
-
+    ax3.legend(handles=(prec_line,recall_line))
+    ax3.set_ylabel("1 sample")
     ax3.set_color_cycle(['r', 'b', 'g', 'y'])
     ax3.set_yticks(np.arange(-0.2, 1, 0.1))
     ax3.set_yticklabels(np.arange(-0.2, 1, 0.1))
-    ax3.set_xticks(xrange(15))
+    ax3.set_xticks(xrange(20))
 
-
+    ax4.set_ylabel("10 samples")
     ax4.set_color_cycle(['r', 'b', 'g', 'y'])
     ax4.set_yticks(np.arange(-0.2, 1, 0.1))
     ax4.set_yticklabels(np.arange(-0.2, 1, 0.1))
-    ax4.set_xticks(xrange(15))
+    ax4.set_xticks(xrange(20))
 
     ax4.set_xlabel("Klassenummer")
 
@@ -161,7 +249,6 @@ def main():
         for class_num in xrange(20):
             y_test=np.load("/home/jasper/oneshot-gestures/output/y_tests/class{}.npy".format(class_num))
             y_pred=np.load("/home/jasper/oneshot-gestures/output/model-19x1-redo/class-{}/layers1-samples{}/y_predictions.npy".format(class_num,num_samples))
-            print(metrics.precision_score(y_test,y_pred,labels=[19],average=None))
             prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
             recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
             i=i+1
@@ -189,7 +276,10 @@ def main():
     if (show_all):
         plt.show()
 
-    # Plot van activatiefuncties
+    #----------------------------#
+    # Plot van activatiefuncties #
+    #----------------------------#
+
     xaxis = np.arange(-2,2,0.1)
     sig=sigmoid(xaxis)
     tanh=np.tanh(xaxis)
@@ -231,7 +321,7 @@ def main():
         y_predictions[i] = np.load("{}output/model-19x1-temp/class-14/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
-    plotPrecRec(y_test, y_predictions, num_samples_array, 0.56, 0.74, "Oneshot gebaar 14")
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.74, 0.65, "Oneshot gebaar 14")
     if(show_all):
         plt.show()
 
