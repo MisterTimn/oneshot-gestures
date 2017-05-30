@@ -167,8 +167,9 @@ if __name__=='__main__':
                                                     last_improvement),end="")
                         print("train err: {:5.2f} val err: {:5.2f} improv: {:3.0f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
-
+                        start_time_2=time.time()
                         q.join()
+                        print(" {}".format(time.time()-start_time_2),end="");sys.stdout.flush()
                     train_loss = train_err / BACKPROPS_PER_EPOCH
                     val_loss, val_acc = validate(convnet,x_validate,labels_validate)
                     backprops = (j+1)* BACKPROPS_PER_EPOCH
