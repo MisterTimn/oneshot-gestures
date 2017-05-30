@@ -104,9 +104,15 @@ def main():
     mpl.rc('text', usetex='true')
     mpl.rc('lines',linewidth=1)
     # mpl.rc('lines',markersize=4)
+    show_all = True
 
-    show_all=True
+    # for num_layers in [1,2,3]:
 
+
+
+    #-----------------------------#
+    #Vergelijking data-augmentatie#
+    #-----------------------------#
     augm = mlines.Line2D([], [], color='red', marker='.', label='Met augmentatie')
     noaugm = mlines.Line2D([], [], color='blue', marker='.', label="Zonder augmentatie")
     base = mlines.Line2D([], [], color='green', linestyle=':',marker='.', label='baseline')
