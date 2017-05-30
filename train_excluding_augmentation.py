@@ -181,7 +181,7 @@ if __name__=='__main__':
                     else:
                         last_improvement+=1
 
-                    if(last_improvement>12):
+                    if(last_improvement>50):
                         break
 
             except KeyboardInterrupt:
