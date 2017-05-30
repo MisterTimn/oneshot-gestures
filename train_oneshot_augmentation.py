@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in xrange(20):
+        for ONESHOT_CLASS in xrange(1,20):
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -226,7 +226,7 @@ if __name__=='__main__':
                             f.write("total backprops: {}\n".format(TOTAL_BACKPROPS))
                             f.write("patience: {}\n".format(patience))
                             f.write(metrics.classification_report(labels_test, y_predictions, digits=4))
-                        q.put('done')
+            q.put('done')
 
 
     except:
