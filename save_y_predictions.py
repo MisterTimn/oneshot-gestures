@@ -39,7 +39,7 @@ def main():
     class_num = 15
     BASE_DIR = "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 
-    load = load_class.load(class_num)
+    load = load_class.load(19)
     x_test, labels_test, indices_test = load.load_testing_set()
     convnet = cnn.convnet_oneshot()
 
