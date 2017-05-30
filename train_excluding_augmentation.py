@@ -24,7 +24,7 @@ if not os.path.exists(PARAM_PATH):
     os.makedirs(PARAM_PATH)
 
 
-TOTAL_BACKPROPS = 60000
+TOTAL_BACKPROPS = 200000
 BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
@@ -93,7 +93,7 @@ if __name__=='__main__':
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
 
-        for ONESHOT_CLASS in xrange(5):
+        for ONESHOT_CLASS in [14,15]:
             backprops=0
 
             EXCLUDING_PARAM_PATH \
@@ -165,7 +165,7 @@ if __name__=='__main__':
                         print("\rBP {} - {} ({}):  ".format(j * BACKPROPS_PER_EPOCH + 1,
                                                     j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH,
                                                     last_improvement),end="")
-                        print("train err: {:5.2f} val acc: {:5.2f} improv: {:3.0f}".format(train_err / i,val_acc,last_improvement), end="");sys.stdout.flush()
+                        print("train err: {:5.2f} val err: {:5.2f} improv: {:3.0f}".format(train_err / i,val_loss), end="");sys.stdout.flush()
                         print("   {:5.0f}%".format(100.0 * (i+1) / BACKPROPS_PER_EPOCH), end="");sys.stdout.flush()
 
                         q.join()

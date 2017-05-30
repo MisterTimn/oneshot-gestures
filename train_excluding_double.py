@@ -23,8 +23,8 @@ augmenter = aug.augmenter()
 
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 MODEL_EXCLUDING =   "model-18"
-ONESHOT_CLASS   =   14
-ONESHOT_CLASS_2 =   15
+ONESHOT_CLASS   =   13
+ONESHOT_CLASS_2 =   18
 
 OUTPUT_DIRECTORY=   "{}output/{}/excluding-{}-{}/".format(BASE_DIR,MODEL_EXCLUDING,ONESHOT_CLASS,ONESHOT_CLASS_2)
 EXCLUDING_PARAM_PATH   \
@@ -59,7 +59,7 @@ labels_test = labels_test[test_indices_to_keep]
 BATCH_SIZE = 32
 
 TOTAL_BACKPROPS = 60000
-BACKPROPS_PER_EPOCH = 400
+BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
