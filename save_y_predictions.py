@@ -49,7 +49,7 @@ def main():
     y_pred = convnet.test_output(x_test)
     print(metrics.classification_report(labels_test, y_pred))
 
-    np.save("{}output/y_pred_naive/y_predictions-0",y_pred)
+    np.save("{}output/y_pred_naive/y_predictions-0".format(BASE_DIR),y_pred)
 
     for num_samples in [1,2,5,10,25,50,100,200]:
         for num_layers_retrained in [1]:
