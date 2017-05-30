@@ -123,7 +123,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1,2,3,4,5,10,25,50,100,200]:
+            for num_oneshot_samples in [2,3,4,5,10,25,50,100,200]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -224,7 +224,7 @@ if __name__=='__main__':
                             f.write("total backprops: \n{}".format(TOTAL_BACKPROPS))
                             f.write("patience: {}\n".format(patience))
                             f.write(metrics.classification_report(labels_test, y_predictions, digits=4))
-                        q.put('done')
+            q.put('done')
 
 
     except:
