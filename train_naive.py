@@ -56,7 +56,7 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
         elif cmd == 'change_num_samples':
             q.task_done()
             indices_train[ONESHOT_CLASS] = indices_train_oneshotclass[:int(q.get())]
-            print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
+            print("Training with {} samples".format(len(indices_train[ONESHOT_CLASS])))
         q.task_done()
         sys.stdout.flush()
 
@@ -137,7 +137,7 @@ if __name__=='__main__':
                     patience = 0
 
                     convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                    convnet.preload_excluding_model(path=EXCLUDING_PARAM_PATH)
+                    convnet.load_param_values(path=EXCLUDING_PARAM_PATH)
 
                     save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
 
