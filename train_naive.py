@@ -102,7 +102,7 @@ if __name__=='__main__':
         # num_oneshot_samples = 2
         for ONESHOT_CLASS in [15]:
 
-            OUTPUT_DIRECTORY = "{}output/naive_model/class-{}/".format(BASE_DIR,OUTPUT_DIRECTORY)
+            OUTPUT_DIRECTORY = "{}output/naive_model/class-{}/".format(BASE_DIR,ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/naive_model/class-{}/".format(BASE_DIR,ONESHOT_CLASS)
             EXCLUDING_PARAM_PATH \
                 = "{}convnet_params/naive_model/param-excl{}".format(BASE_DIR,ONESHOT_CLASS)
