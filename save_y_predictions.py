@@ -36,7 +36,7 @@ def getParamExcludingPath(class_num):
     return "{}convnet_params/model-19/excluding-{}".format(base_dir_path,class_num)
 
 def main():
-    class_num = 19
+    class_num = 17
     BASE_DIR = "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 
     load = load_class.load(19)
