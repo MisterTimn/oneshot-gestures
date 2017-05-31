@@ -58,7 +58,7 @@ labels_test = labels_test[test_indices_to_keep]
 
 BATCH_SIZE = 32
 
-TOTAL_BACKPROPS = 60000
+TOTAL_BACKPROPS = 200000
 BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
@@ -146,6 +146,8 @@ if __name__=='__main__':
 
         convnet = cnn.convnet()
 
+        patience=0
+
         try:
             q = mp.JoinableQueue()
             proc = mp.Process(target=worker_backprop, args=[q])
@@ -187,14 +189,21 @@ if __name__=='__main__':
                 if (val_loss < min_val_err):
                     min_val_err = val_loss
                     convnet.save_param_values(EXCLUDING_PARAM_PATH)
+                    patience = 0
+                else:
+                    patience = patience + 1
+
+
 
                 print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
                                                   j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
                 sys.stdout.flush()
 
-                print(" val acc: {:5.2f}%".format(val_acc * 100.0))
+                print(" v_acc: {:5.2f}% train_err: {:5.4f} val_err: {:5.4f}".format(val_acc * 100.0,train_loss,val_loss))
 
                 ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
+                if(patience > 50):
+                    break;
 
         except KeyboardInterrupt:
             print("Iteration stopped through KeyboardInterrupt")
