@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [14]:
+        for ONESHOT_CLASS in [15]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [200,100,50,25,10,5,4,3,2]:
+            for num_oneshot_samples in [200,100,50,25,10,5,4,3,2,1]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -188,7 +188,7 @@ if __name__=='__main__':
                             else:
                                 patience+=1
 
-                            if(patience>25):
+                            if(patience>50):
                                 break
 
                             print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
