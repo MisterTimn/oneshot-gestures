@@ -28,7 +28,7 @@ MODEL_EXCLUDING =   "model-19-redo"
 # if not os.path.exists(PARAM_DIRECTORY):
 #     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 20000
+TOTAL_BACKPROPS = 200000
 BACKPROPS_PER_EPOCH = 250
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
@@ -102,12 +102,12 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [14,18]:
+        for ONESHOT_CLASS in [14,15]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             EXCLUDING_PARAM_PATH \
-                = "{}convnet_params/{}/excluding-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
+                = "{}convnet_params/{}/excluding-{}-augm".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS)
 
             if not os.path.exists(OUTPUT_DIRECTORY):
                 os.makedirs(OUTPUT_DIRECTORY)
@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1]:
+            for num_oneshot_samples in [1,2,3,4,5,10,25,50,100,200]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -136,6 +136,7 @@ if __name__=='__main__':
                     precision_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                     recall_list = np.zeros((NUM_EPOCHS, NUM_CLASSES))
                     min_val_acc = 0
+                    min_val_loss = 20
                     patience = 0
 
                     convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
@@ -180,25 +181,29 @@ if __name__=='__main__':
 
                             ds.saveValues((train_loss,val_loss,val_acc,time.time()-start_time))
 
-                            if (val_acc > min_val_acc):
-                                min_val_acc = val_acc
+                            if (min_val_loss > val_loss):
+                                min_val_loss=val_loss
                                 convnet.save_param_values(save_param_path)
                                 patience = 0
                             else:
                                 patience+=1
 
+                            if(patience>25):
+                                break
+
                             print("\r{:5.0f}-{:5.0f}:".format(j * BACKPROPS_PER_EPOCH + 1,
                                                               j * BACKPROPS_PER_EPOCH + BACKPROPS_PER_EPOCH), end="");
                             sys.stdout.flush()
 
-                            print(" patience: {:3} val acc: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
-                                  .format(patience,val_acc * 100.0, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
+                            print(" patience: {:3} val loss: {:5.2f}%, precision: {:5.2f}%, recall: {:5.2f}%"
+                                  .format(patience,val_loss, precision_score[NUM_CLASSES - 1] * 100.0, recall_score[NUM_CLASSES - 1] * 100.0))
 
                     except KeyboardInterrupt:
                         print("Iteration stopped through KeyboardInterrupt")
                     except:
                         raise
                     finally:
+                        q.put('done')
                         if os.path.exists(save_param_path):
                             convnet.load_param_values(save_param_path)
 

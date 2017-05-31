@@ -56,7 +56,7 @@ def sigmoid(x):
 
 
 
-def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, title="F1 score"):
+def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, title="F1 score", oneshot_class=19):
 
     # plt.grid(True)
     prec_scores = np.zeros(len(y_predictions))
@@ -64,8 +64,8 @@ def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, ti
 
     i = 0
     for y_pred in y_predictions:
-        prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
-        recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+        prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[oneshot_class], average=None)
+        recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[oneshot_class], average=None)
 
         i += 1
 
@@ -74,14 +74,14 @@ def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, ti
     plt.plot(x_labels,prec_scores, 'b')
     plt.plot(x_labels,recall_scores, 'r')
 
-    plt.plot(x_labels,prec_scores, 'bo')
-    plt.plot(x_labels,recall_scores, 'ro')
+    plt.plot(x_labels,prec_scores, 'b.')
+    plt.plot(x_labels,recall_scores, 'r.')
 
     plt.axhline(y=baseline_prec, xmin=0, xmax=1, linewidth=1, color='blue', linestyle=':', hold=None)
     plt.axhline(y=baseline_rec, xmin=0, xmax=1, linewidth=1, color='red', linestyle=':', hold=None)
 
-    blue_line = mlines.Line2D([], [], color='blue', marker='o', label='precision')
-    red_line = mlines.Line2D([], [], color='red', marker='o', label="recall")
+    blue_line = mlines.Line2D([], [], color='blue', marker='.', label='precision')
+    red_line = mlines.Line2D([], [], color='red', marker='.', label="recall")
     blue_dash = mlines.Line2D([], [], color='blue', linestyle=':', linewidth=1, label='precision baseline')
     red_dash = mlines.Line2D([], [], color='red', linestyle=':', linewidth=1, label='recall baseline')
 
@@ -104,11 +104,23 @@ def main():
     mpl.rc('text', usetex='true')
     mpl.rc('lines',linewidth=1)
     # mpl.rc('lines',markersize=4)
-    show_all = True
+    show_all = False
 
     # for num_layers in [1,2,3]:
 
-
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions = np.empty((len(num_samples_array), 2000))
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load(
+            "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, "Oneshot gebaar 15",oneshot_class=15)
+    if (show_all):
+        plt.show()
+    plt.show()
 
     #-----------------------------#
     #Vergelijking data-augmentatie#
@@ -153,7 +165,7 @@ def main():
     all_prec=metrics.precision_score(y_test,y_pred,average=None)
     all_recall=metrics.recall_score(y_test,y_pred,average=None)
 
-    for num_samples in [1]:
+    for num_samples in [1,10]:
 
         prec_scores = np.empty(20)
         recall_scores = np.empty(20)
@@ -330,24 +342,6 @@ def main():
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.74, 0.65, "Oneshot gebaar 14")
     if(show_all):
         plt.show()
-
-    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
-    num_samples_array = [1, 2, 3, 4, 5,10, 25, 50, 100, 200]
-    y_predictions = np.empty((len(num_samples_array), 2000))
-    i = 0
-    for num_samples in num_samples_array:
-        y_predictions[i] = np.load(
-            "{}output/model-19x1-temp/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
-        i += 1
-    plt.figure(figsize=cm2inch(14, 9))
-    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, "Oneshot gebaar 15")
-    if (show_all):
-        plt.show()
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
