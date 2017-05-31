@@ -102,7 +102,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [14,15]:
+        for ONESHOT_CLASS in [14]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
@@ -125,7 +125,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1,2,3,4,5,10,25,50,100,200]:
+            for num_oneshot_samples in [200,100,50,25,10,5,4,3,2]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
@@ -203,7 +203,6 @@ if __name__=='__main__':
                     except:
                         raise
                     finally:
-                        q.put('done')
                         if os.path.exists(save_param_path):
                             convnet.load_param_values(save_param_path)
 
