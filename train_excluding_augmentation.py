@@ -24,7 +24,7 @@ if not os.path.exists(PARAM_PATH):
     os.makedirs(PARAM_PATH)
 
 
-TOTAL_BACKPROPS = 200000
+TOTAL_BACKPROPS = 100000
 BACKPROPS_PER_EPOCH = 500
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 
@@ -134,6 +134,7 @@ if __name__=='__main__':
             last_improvement = 0
 
             convnet = cnn.convnet(num_output_units=19)
+            convnet.load_param_values(EXCLUDING_PARAM_PATH)
 
             try:
                 q = mp.JoinableQueue()
