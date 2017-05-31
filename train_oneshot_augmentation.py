@@ -9,7 +9,7 @@ import os
 from sklearn import metrics
 
 import augmentation_v2 as aug
-import convnet_19x1 as cnn
+import convnet_19x1_augm as cnn
 import load_class
 from util.dataprocessing import DataSaver
 
