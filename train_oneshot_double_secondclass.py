@@ -58,8 +58,9 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass,in
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
             q.task_done()
-            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:int(q.get())]
-            indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass_2[:int(q.get())]
+            num_samples = int(q.get())
+            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[num_samples]
+            indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass_2[num_samples]
             print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
         q.task_done()
         sys.stdout.flush()
@@ -104,7 +105,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [18]:
+        for class_os in [18]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS,ONESHOT_CLASS_2)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS,ONESHOT_CLASS_2)
