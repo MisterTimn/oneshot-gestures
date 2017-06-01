@@ -16,8 +16,8 @@ from util.dataprocessing import DataSaver
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 MODEL_VERS      =   "model-18x2"
 MODEL_EXCLUDING =   "model-18"
-ONESHOT_CLASS   =   13
-ONESHOT_CLASS_2 =   18
+ONESHOT_CLASS   =   18
+ONESHOT_CLASS_2 =   13
 
 # OUTPUT_DIRECTORY=   "{}output/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
 # PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS)
