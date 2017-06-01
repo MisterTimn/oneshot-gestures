@@ -115,7 +115,7 @@ if __name__=='__main__':
             if not os.path.exists(PARAM_DIRECTORY):
                 os.makedirs(PARAM_DIRECTORY)
 
-            loader = load_class.load(ONESHOT_CLASS,ONESHOT_CLASS_2)
+            loader = load_class.load(13,18)
             samples, labels, indices_train = loader.load_training_set()
             x_validate_orig, labels_validate_orig, indices_validate = loader.load_validation_set()
             x_test_orig, labels_test_orig, indices_test = loader.load_testing_set()
