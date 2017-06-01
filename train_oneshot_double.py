@@ -16,8 +16,8 @@ from util.dataprocessing import DataSaver
 BASE_DIR        =   "{}/".format(os.path.dirname(os.path.abspath(__file__)))
 MODEL_VERS      =   "model-18x2"
 MODEL_EXCLUDING =   "model-18"
-ONESHOT_CLASS   =   14
-ONESHOT_CLASS_2 =   15
+ONESHOT_CLASS   =   13
+ONESHOT_CLASS_2 =   18
 
 OUTPUT_DIRECTORY=   "{}output/{}/class-{}-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS,ONESHOT_CLASS_2)
 PARAM_DIRECTORY =   "{}convnet_params/{}/class-{}-{}/".format(BASE_DIR,MODEL_VERS,ONESHOT_CLASS,ONESHOT_CLASS_2)
@@ -29,8 +29,8 @@ if not os.path.exists(OUTPUT_DIRECTORY):
 if not os.path.exists(PARAM_DIRECTORY):
     os.makedirs(PARAM_DIRECTORY)
 
-TOTAL_BACKPROPS = 10000
-BACKPROPS_PER_EPOCH = 100
+TOTAL_BACKPROPS = 200000
+BACKPROPS_PER_EPOCH = 250
 NUM_EPOCHS = TOTAL_BACKPROPS / BACKPROPS_PER_EPOCH
 NUM_CLASSES = 20
 BATCH_SIZE = 32
