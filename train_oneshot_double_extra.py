@@ -146,7 +146,7 @@ if __name__=='__main__':
             proc.daemon = True
             proc.start()
 
-            for num_oneshot_samples in [1,10,100]:
+            for num_oneshot_samples in [10,100]:
                 for retrain_layers in [1]:
                     q.put('change_num_samples')
                     q.join()
