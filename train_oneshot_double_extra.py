@@ -108,7 +108,7 @@ if __name__=='__main__':
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             EXCLUDING_PARAM_PATH \
-                = "{}convnet_params/{}/excluding-{}-{}".format(BASE_DIR, MODEL_EXCLUDING, ONESHOT_CLASS, ONESHOT_CLASS_2)
+                = "{}convnet_params/{}/excluding-13-18".format(BASE_DIR, MODEL_EXCLUDING)
 
             if not os.path.exists(OUTPUT_DIRECTORY):
                 os.makedirs(OUTPUT_DIRECTORY)
