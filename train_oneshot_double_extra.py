@@ -103,7 +103,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [13,18]:
+        for ONESHOT_CLASS in [18]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS)

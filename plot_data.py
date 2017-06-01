@@ -130,8 +130,10 @@ def plotPrecRec(y_test, y_predictions, x_labels, baseline_prec, baseline_rec, ti
     for y_pred in y_predictions:
         prec_scores[i] = metrics.precision_score(y_test, y_pred, labels=[oneshot_class], average=None)
         recall_scores[i] = metrics.recall_score(y_test, y_pred, labels=[oneshot_class], average=None)
-
         i += 1
+
+    print(prec_scores)
+    print(recall_scores)
 
     plt.xlabel(r"Aantal samples")
 
@@ -173,6 +175,33 @@ def plotNaive15():
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, "Oneshot gebaar 15", oneshot_class=15)
     plt.show()
+
+def plotNaive15():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions = np.empty((len(num_samples_array), 2000))
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load(
+            "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95,title="", oneshot_class=15)
+    plt.show()
+
+def plotNaive15Layers2():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions = np.empty((len(num_samples_array), 2000))
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load(
+            "{}output/naive_model/class-15/layers2-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95,title="", oneshot_class=15)
+    plt.show()
+
 
 def plot15():
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
@@ -422,8 +451,9 @@ def main():
     # plotOneshotAll()
     # plotActivationFunctions()
 
-    plot14augm()
-    plot14()
+    plotNaive15()
+
+    plotNaive15Layers2()
 
     #
     # y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
