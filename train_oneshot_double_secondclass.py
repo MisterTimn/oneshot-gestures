@@ -58,9 +58,11 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass,in
             np.copyto(sharedLabelArray,labels[indices])
         elif cmd == 'change_num_samples':
             q.task_done()
+            print("receive")
             num_samples = int(q.get())
-            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[num_samples]
-            indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass_2[num_samples]
+            print("received")
+            indices_train[NUM_CLASSES - 1] = indices_train_oneshotclass[:num_samples]
+            indices_train[NUM_CLASSES - 2] = indices_train_oneshotclass_2[:num_samples]
             print("Training with {} samples".format(len(indices_train[NUM_CLASSES - 1])))
         q.task_done()
         sys.stdout.flush()
