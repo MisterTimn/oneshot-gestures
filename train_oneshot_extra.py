@@ -41,8 +41,8 @@ def worker_backprop(q,samples,labels,indices_train,indices_train_oneshotclass):
     #Data voor volgende iteratie ophalen en verwerken
     #Opslaan in shared memory
     done = False
-    sharedSampleArray = sa.attach("shm://samples")
-    sharedLabelArray = sa.attach("shm://labels")
+    sharedSampleArray = sa.attach("shm://samples5")
+    sharedLabelArray = sa.attach("shm://labels5")
     indices = np.empty(BATCH_SIZE, dtype='int32')
 
     while not done:
@@ -92,8 +92,8 @@ def validate(convnet, inputs, targets):
 if __name__=='__main__':
     q = mp.JoinableQueue()
     try:
-        sharedSampleArray = sa.create("shm://samples", (BATCH_SIZE, 12, 64, 64), dtype='float32')
-        sharedLabelArray = sa.create("shm://labels", BATCH_SIZE, dtype='int32')
+        sharedSampleArray = sa.create("shm://samples5", (BATCH_SIZE, 12, 64, 64), dtype='float32')
+        sharedLabelArray = sa.create("shm://labels5", BATCH_SIZE, dtype='int32')
 
         sample_batch    = np.empty(sharedSampleArray.shape, dtype='float32')
         label_batch     = np.empty(sharedLabelArray.shape, dtype='int32')
@@ -235,6 +235,6 @@ if __name__=='__main__':
     except:
         raise
     finally:
-        sa.delete("samples")
-        sa.delete("labels")
+        sa.delete("samples5")
+        sa.delete("labels5")
     print("End of program")
