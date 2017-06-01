@@ -104,7 +104,7 @@ if __name__=='__main__':
         # retrain_layers = 3
         # for num_oneshot_samples in [200,100,50,25,10]:
         # num_oneshot_samples = 2
-        for ONESHOT_CLASS in [13]:
+        for ONESHOT_CLASS in [18]:
 
             OUTPUT_DIRECTORY = "{}output/{}/class-{}-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS,ONESHOT_CLASS_2)
             PARAM_DIRECTORY = "{}convnet_params/{}/class-{}-{}/".format(BASE_DIR, MODEL_VERS, ONESHOT_CLASS,ONESHOT_CLASS_2)
@@ -144,12 +144,12 @@ if __name__=='__main__':
                     patience = 0
 
                     convnet = cnn.convnet_oneshot(num_output_units=20, num_layers_retrain=retrain_layers)
-                    convnet.preload_first_oneshot("{}convnet_params/model18x2/class-18/layers{}-samples{}"
+                    convnet.preload_first_oneshot("{}convnet_params/model-18x2/class-13/layers{}-samples{}"
                                                   .format(BASE_DIR,retrain_layers,num_oneshot_samples))
 
                     save_param_path = "{}layers{}-samples{}".format(PARAM_DIRECTORY, retrain_layers, num_oneshot_samples)
 
-                    print("Class {}{} samples {}".format(ONESHOT_CLASS,ONESHOT_CLASS_2,num_oneshot_samples))
+                    print("Class {} {} samples {}".format(ONESHOT_CLASS,ONESHOT_CLASS_2,num_oneshot_samples))
 
                     q.join()
                     try:
