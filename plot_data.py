@@ -173,19 +173,6 @@ def plotNaive15():
             "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
-    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, "Oneshot gebaar 15", oneshot_class=15)
-    plt.show()
-
-def plotNaive15():
-    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
-    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
-    y_predictions = np.empty((len(num_samples_array), 2000))
-    i = 0
-    for num_samples in num_samples_array:
-        y_predictions[i] = np.load(
-            "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
-        i += 1
-    plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95,title="", oneshot_class=15)
     plt.show()
 
@@ -451,9 +438,9 @@ def main():
     # plotOneshotAll()
     # plotActivationFunctions()
 
-    plotNaive15()
-
-    plotNaive15Layers2()
+    # plotNaive15()
+    #
+    # plotNaive15Layers2()
 
     #
     # y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
