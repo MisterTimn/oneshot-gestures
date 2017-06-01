@@ -120,6 +120,8 @@ if __name__=='__main__':
             x_validate_orig, labels_validate_orig, indices_validate = loader.load_validation_set()
             x_test_orig, labels_test_orig, indices_test = loader.load_testing_set()
 
+            indices_train_oneshotclass = indices_train[NUM_CLASSES - 2]
+
             val_indices_to_keep = indices_validate[0]
             test_indices_to_keep = indices_test[0]
             for i in xrange(1, 19):
