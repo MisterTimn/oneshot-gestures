@@ -92,7 +92,7 @@ class convnet_oneshot(object):
         params = self.network.get_params(trainable=True)
         params.extend(self.concat.get_params(trainable=True))
         # params.extend(self.dense_excluding.get_params(trainable=True))
-        params.extend(self.dense_oneshot.get_params(trainable=True))
+        params.extend(self.dense_oneshot_2.get_params(trainable=True))
         # if(num_layers_retrain>=2):
         #     params.extend(self.dense2.get_params(trainable=True))
         # if(num_layers_retrain>=3):
@@ -139,6 +139,18 @@ class convnet_oneshot(object):
         with open(path, 'rb') as f:
             param_values = pickle.load(f)
         nn.layers.set_all_param_values(self.dense_excluding,param_values)
+
+    def preload_first_oneshot(self, path):
+        with open(path, 'rb') as f:
+            param_values = pickle.load(f)
+        nn.layers.set_all_param_values(self.network,param_values)
+        self.dense_oneshot_2 = nn.layers.DenseLayer(self.dense2,
+                                                  num_units=1,
+                                                  W=nn.init.Constant(0.0),
+                                                  b=nn.init.Constant(0.0),
+                                                  nonlinearity=nn.nonlinearities.identity)
+
+
     def save_param_values(self, path):
         param_values = nn.layers.get_all_param_values(self.network)
         with open(path, 'wb') as f:

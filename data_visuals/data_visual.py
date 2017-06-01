@@ -19,21 +19,20 @@ load = load_class.load(1)
 # pylab.title('Double image')
 # pylab.show()
 
-x_validate, labels_validate = load.load_validation_set()
+x_validate, labels_validate,indices = load.load_validation_set()
 
 
 class_to_filter=0
 aantal = 0
 for i, j in enumerate(labels_validate[0:1000]):
     if j == class_to_filter:
-    	f = pylab.figure()
+    	f = pylab.figure();print(j)
     	for k in range(12):
     		f.add_subplot(3,4,k+1)
-    		pylab.imshow(x_validate[i,k])
-        	pylab.title("%s" % k)
+    		pylab.imshow(x_validate[i,k],cmap='binary')
+        	# pylab.title("%s" % k)
     		pylab.axis('off')
         class_to_filter+=1
-        pylab.savefig("Gebaar %s" % j)
-        #pylab.show()
+        pylab.show()
     elif 19 < class_to_filter:
     	break

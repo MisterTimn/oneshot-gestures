@@ -226,7 +226,20 @@ def plot14augm():
             "{}output/model-19x1-redo/class-14/layers1-samples{}augm/y_predictions.npy".format(BASE_DIR, num_samples))
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
-    plotPrecRec(y_test, y_predictions, num_samples_array, 0.74, 0.65, "Oneshot gebaar 14")
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.74, 0.65)
+    plt.show()
+
+def plot15augm():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
+    num_samples_array = [1, 2, 3, 4, 5,10,25,50,100,200]
+    y_predictions = np.empty((len(num_samples_array), 2000))
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions[i] = np.load(
+            "{}output/model-19x1-redo/class-15/layers1-samples{}augm/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+    plt.figure(figsize=cm2inch(14, 9))
+    plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, title="")
     plt.show()
 
 def plotDataAugm():
@@ -431,6 +444,8 @@ def main():
     mpl.rc('text', usetex='true')
     mpl.rc('lines',linewidth=1)
 
+
+    plot15augm()
     # plotNaive15()
     # plot14()
     # plot15()
