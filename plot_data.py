@@ -14,6 +14,7 @@ import math
 import os
 import util.dataprocessing
 from sklearn import metrics
+import load_class_2
 dp = util.dataprocessing.DataPlotter()
 
 
@@ -189,10 +190,87 @@ def plotNaive15Layers2():
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95,title="", oneshot_class=15)
     plt.show()
 
+def plotNaiveLayers():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions_1 = np.empty((len(num_samples_array), 2000))
+    y_predictions_2 = np.empty((len(num_samples_array), 2000))
+
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions_1[i] = np.load(
+            "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        y_predictions_2[i] = np.load(
+            "{}output/naive_model/class-15/layers2-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+
+        i += 1
+    plt.figure(figsize=cm2inch(16, 11))
+
+
+    # plt.grid(True)
+    prec_scores_1 = np.zeros(len(y_predictions_1))
+    recall_scores_1 = np.zeros(len(y_predictions_1))
+
+    prec_scores_2 = np.zeros(len(y_predictions_2))
+    recall_scores_2 = np.zeros(len(y_predictions_2))
+
+    i = 0
+    for y_pred in y_predictions_1:
+        prec_scores_1[i] = metrics.precision_score(y_test, y_pred, labels=[15], average=None)
+        recall_scores_1[i] = metrics.recall_score(y_test, y_pred, labels=[15], average=None)
+        i += 1
+    i=0
+    for y_pred in y_predictions_2:
+        prec_scores_2[i] = metrics.precision_score(y_test, y_pred, labels=[15], average=None)
+        recall_scores_2[i] = metrics.recall_score(y_test, y_pred, labels=[15], average=None)
+        i += 1
+
+
+    plt.xlabel(r"Aantal samples")
+
+    x_labels=num_samples_array
+    # plt.ylabels(np.arange(0,1,0.1))
+    plt.yticks(np.arange(0,1.1,0.1))
+
+    plt.plot(x_labels,prec_scores_1, 'b')
+    plt.plot(x_labels,recall_scores_1, 'r')
+
+    plt.plot(x_labels,prec_scores_1, 'b.')
+    plt.plot(x_labels,recall_scores_1, 'r.')
+
+    plt.plot(x_labels, prec_scores_2, 'c')
+    plt.plot(x_labels, recall_scores_2, 'm')
+
+    plt.plot(x_labels, prec_scores_2, 'cx')
+    plt.plot(x_labels, recall_scores_2, 'mx')
+
+    plt.axhline(y=0.97, xmin=0, xmax=1, linewidth=0.5, color='blue', linestyle=':', hold=None)
+    plt.axhline(y=0.95, xmin=0, xmax=1, linewidth=0.5, color='red', linestyle=':', hold=None)
+
+    blue_line = mlines.Line2D([], [], color='blue', marker='.', label='precision 1 laag')
+    red_line = mlines.Line2D([], [], color='red', marker='.', label="recall 1 laag")
+    blue_line_2 = mlines.Line2D([], [], color='cyan', marker='.', linestyle='--', label='precision 2 lagen')
+    red_line_2 = mlines.Line2D([], [], color='magenta', marker='.', linestyle='--', label="recall 2 lagen")
+    blue_dash = mlines.Line2D([], [], color='blue', linestyle=':', linewidth=0.5, label='precision baseline')
+    red_dash = mlines.Line2D([], [], color='red', linestyle=':', linewidth=0.5, label='recall baseline')
+
+
+    plt.legend(handles=(blue_line,blue_line_2,red_line_2,red_line,blue_dash,red_dash))
+
+
+    ax = plt.subplot(111)
+    ax.set_xscale('log')
+    ax.set_xticks(x_labels)
+    ax.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    plt.title("",size=12)
+    plt.tight_layout()
+    plt.show()
+
 
 def plot15():
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
-    num_samples_array = [1, 2, 3, 4, 5, 25, 50, 100, 200]
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
     y_predictions = np.empty((len(num_samples_array), 2000))
     i = 0
     for num_samples in num_samples_array:
@@ -205,7 +283,7 @@ def plot15():
 
 def plot14():
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class14.npy")
-    num_samples_array = [1, 2, 3, 4, 5, 200]
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
     y_predictions = np.empty((len(num_samples_array), 2000))
     i = 0
     for num_samples in num_samples_array:
@@ -240,6 +318,152 @@ def plot15augm():
         i += 1
     plt.figure(figsize=cm2inch(14, 9))
     plotPrecRec(y_test, y_predictions, num_samples_array, 0.97, 0.95, title="")
+    plt.show()
+
+def plotVgl15Augm():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions_1 = np.empty((len(num_samples_array), 2000))
+    y_predictions_2 = np.empty((len(num_samples_array), 2000))
+
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions_1[i] = np.load(
+            "{}output/model-19x1-temp/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        y_predictions_2[i] = np.load(
+            "{}output/model-19x1-redo/class-15/layers1-samples{}augm/y_predictions.npy".format(BASE_DIR, num_samples))
+
+        i += 1
+    plt.figure(figsize=cm2inch(16, 11))
+
+
+    # plt.grid(True)
+    prec_scores_1 = np.zeros(len(y_predictions_1))
+    recall_scores_1 = np.zeros(len(y_predictions_1))
+
+    prec_scores_2 = np.zeros(len(y_predictions_2))
+    recall_scores_2 = np.zeros(len(y_predictions_2))
+
+    i = 0
+    for y_pred in y_predictions_1:
+        prec_scores_1[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+        recall_scores_1[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+        i += 1
+    i=0
+    for y_pred in y_predictions_2:
+        prec_scores_2[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+        recall_scores_2[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+        i += 1
+
+
+    plt.xlabel(r"Aantal samples")
+
+    x_labels=num_samples_array
+    # plt.ylabels(np.arange(0,1,0.1))
+    plt.yticks(np.arange(0,1.1,0.1))
+
+    plt.plot(x_labels,prec_scores_1, 'b')
+    plt.plot(x_labels,recall_scores_1, 'r')
+
+    plt.plot(x_labels,prec_scores_1, 'b.')
+    plt.plot(x_labels,recall_scores_1, 'r.')
+
+    plt.plot(x_labels, prec_scores_2, 'c')
+    plt.plot(x_labels, recall_scores_2, 'm')
+
+    plt.plot(x_labels, prec_scores_2, 'cx')
+    plt.plot(x_labels, recall_scores_2, 'mx')
+
+    plt.axhline(y=0.97, xmin=0, xmax=1, linewidth=0.5, color='blue', linestyle=':', hold=None)
+    plt.axhline(y=0.95, xmin=0, xmax=1, linewidth=0.5, color='red', linestyle=':', hold=None)
+
+    blue_line = mlines.Line2D([], [], color='blue', marker='.', label='precision')
+    red_line = mlines.Line2D([], [], color='red', marker='.', label="recall")
+    blue_line_2 = mlines.Line2D([], [], color='cyan', marker='.', linestyle='--', label='precision met augmentatie')
+    red_line_2 = mlines.Line2D([], [], color='magenta', marker='.', linestyle='--', label="recall met augmentatie")
+    blue_dash = mlines.Line2D([], [], color='blue', linestyle=':', linewidth=0.5, label='precision baseline')
+    red_dash = mlines.Line2D([], [], color='red', linestyle=':', linewidth=0.5, label='recall baseline')
+
+
+    plt.legend(handles=(blue_line,red_line,blue_line_2,red_line_2,blue_dash,red_dash))
+
+    ax = plt.subplot(111)
+    ax.set_xscale('log')
+    ax.set_xticks(x_labels)
+    ax.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    plt.show()
+
+def plot18x2():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class13-18.npy")
+    num_samples_array = [1,10,100]
+    y_predictions_1 = np.empty((len(num_samples_array), 2000))
+    y_predictions_2 = np.empty((len(num_samples_array), 2000))
+
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions_1[i] = np.load(
+            "{}output/model-18x2/class-13-18/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        i += 1
+
+
+    # plt.grid(True)
+    prec_scores_1 = np.zeros(len(y_predictions_1))
+    recall_scores_1 = np.zeros(len(y_predictions_1))
+
+    prec_scores_2 = np.zeros(len(y_predictions_1))
+    recall_scores_2 = np.zeros(len(y_predictions_1))
+
+    i = 0
+    for y_pred in y_predictions_1:
+        prec_scores_1[i] = metrics.precision_score(y_test, y_pred, labels=[18], average=None)
+        recall_scores_1[i] = metrics.recall_score(y_test, y_pred, labels=[18], average=None)
+        prec_scores_2[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+        recall_scores_2[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+        i += 1
+
+    OS_1 = mlines.Line2D([], [], color='red', marker='.', label='gebaar 13')
+    OS_10 = mlines.Line2D([], [], color='blue', marker='.', label="gebaar 18")
+    base = mlines.Line2D([], [], color='green', linewidth=0.5, linestyle=':', label='baseline 13')
+    base2= mlines.Line2D([], [], color='orange', linewidth=0.5, linestyle=':', label='baseline 18')
+
+    fig, (ax0, ax1) = plt.subplots(nrows=2)
+
+    ax1.legend(handles=(OS_1, OS_10, base, base2))
+    ax0.set_ylabel("Precision")
+    ax0.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax0.set_xscale('log')
+    ax0.set_xticks([1,10,100])
+    ax0.set_xticklabels([1,10,100])
+    ax0.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    ax1.set_ylabel("Recall")
+    ax1.set_color_cycle(['r', 'r', 'b', 'b', 'g', 'g'])
+    ax1.set_xscale('log')
+    ax1.set_xticks([1,10,100])
+    ax1.set_xticklabels([1,10,100])
+    ax1.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+    ax1.set_xlabel("Klassenummer")
+
+
+    ax0.plot([1,10,100], prec_scores_1, '-')
+    ax0.plot([1,10,100], prec_scores_1, '.')
+    ax0.plot([1,10,100], prec_scores_2, '-')
+    ax0.plot([1,10,100], prec_scores_2, '.')
+
+    ax1.plot([1,10,100], recall_scores_1, '-')
+    ax1.plot([1,10,100], recall_scores_1, '.')
+    ax1.plot([1,10,100], recall_scores_2, '-')
+    ax1.plot([1,10,100], recall_scores_2, '.')
+
+    ax0.axhline(y=0.8039, xmin=0, xmax=1, linewidth=1, color='green', linestyle=':')
+    ax0.axhline(y=0.9069, xmin=0, xmax=1, linewidth=1, color='yellow', linestyle=':')
+    ax1.axhline(y=0.7961, xmin=0, xmax=1, linewidth=1, color='green', linestyle=':')
+    ax1.axhline(y=0.8387, xmin=0, xmax=1, linewidth=1, color='yellow', linestyle=':')
+
+    # plt.tight_layout()
+    # plt.show()
+    plt.tight_layout()
     plt.show()
 
 def plotDataAugm():
@@ -339,14 +563,8 @@ def plotOneshotAll():
     OS_1 = mlines.Line2D([], [], color='red', marker='.', label='1 sample')
     OS_10 = mlines.Line2D([], [], color='blue', marker='.', label="10 samples")
     base = mlines.Line2D([], [], color='green', linestyle=':',marker='.', label='baseline')
-    recall_line = mlines.Line2D([], [], color='red', linestyle='', marker='.', label='recall')
-    prec_line = mlines.Line2D([], [], color='blue', linestyle='', marker='.', label='prec')
-
-
 
     fig, (ax0, ax1) = plt.subplots(nrows=2)
-    fig2,(ax3,ax4) = plt.subplots(nrows=2)
-
 
     ax0.legend(handles=(OS_1,OS_10,base))
     ax0.set_ylabel("Precision")
@@ -359,21 +577,6 @@ def plotOneshotAll():
     ax1.set_xticks(xrange(20))
     ax1.set_xticklabels(xrange(20))
     ax1.set_xlabel("Klassenummer")
-
-    ax3.legend(handles=(prec_line,recall_line))
-    ax3.set_ylabel("1 sample")
-    ax3.set_color_cycle(['r', 'b', 'g', 'y'])
-    ax3.set_yticks(np.arange(-0.2, 1, 0.1))
-    ax3.set_yticklabels(np.arange(-0.2, 1, 0.1))
-    ax3.set_xticks(xrange(20))
-
-    ax4.set_ylabel("10 samples")
-    ax4.set_color_cycle(['r', 'b', 'g', 'y'])
-    ax4.set_yticks(np.arange(-0.2, 1, 0.1))
-    ax4.set_yticklabels(np.arange(-0.2, 1, 0.1))
-    ax4.set_xticks(xrange(20))
-
-    ax4.set_xlabel("Klassenummer")
 
     y_pred=np.load("/home/jasper/oneshot-gestures/output/conf_matrix_data/all.npy")
     y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
@@ -395,13 +598,6 @@ def plotOneshotAll():
         ax0.plot(xrange(20), prec_scores, '.')
         ax1.plot(xrange(20),recall_scores,label="recall score")
         ax1.plot(xrange(20), recall_scores, '.')
-
-        if(num_samples==1):
-            ax3.plot(xrange(20),all_recall[:20]-recall_scores,'.')
-            ax3.plot(xrange(20), all_prec[:20]-prec_scores, '.')
-        else:
-            ax4.plot(xrange(20), all_recall[:20] - recall_scores, '.')
-            ax4.plot(xrange(20), all_prec[:20] - prec_scores, '.')
 
 
     ax0.plot(xrange(20),all_prec,':')
@@ -439,13 +635,105 @@ def plotActivationFunctions():
     plt.tight_layout()
     plt.show()
 
+def plotVgl19x1Naive():
+    y_test = np.load("/home/jasper/oneshot-gestures/output/y_tests/class15.npy")
+    y_test_2 = np.load("/home/jasper/oneshot-gestures/output/y_tests/class19.npy")
+    num_samples_array = [1, 2, 3, 4, 5, 10, 25, 50, 100, 200]
+    y_predictions_1 = np.empty((len(num_samples_array), 2000))
+    y_predictions_2 = np.empty((len(num_samples_array), 2000))
+
+    i = 0
+    for num_samples in num_samples_array:
+        y_predictions_1[i] = np.load(
+            "{}output/model-19x1-temp/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+        y_predictions_2[i] = np.load(
+            "{}output/naive_model/class-15/layers1-samples{}/y_predictions.npy".format(BASE_DIR, num_samples))
+
+        i += 1
+    plt.figure(figsize=cm2inch(16, 11))
+
+    # plt.grid(True)
+    prec_scores_1 = np.zeros(len(y_predictions_1))
+    recall_scores_1 = np.zeros(len(y_predictions_1))
+
+    prec_scores_2 = np.zeros(len(y_predictions_2))
+    recall_scores_2 = np.zeros(len(y_predictions_2))
+
+    i = 0
+    for y_pred in y_predictions_1:
+        prec_scores_1[i] = metrics.precision_score(y_test, y_pred, labels=[19], average=None)
+        recall_scores_1[i] = metrics.recall_score(y_test, y_pred, labels=[19], average=None)
+        i += 1
+    i = 0
+    for y_pred in y_predictions_2:
+        prec_scores_2[i] = metrics.precision_score(y_test_2, y_pred, labels=[15], average=None)
+        recall_scores_2[i] = metrics.recall_score(y_test_2, y_pred, labels=[15], average=None)
+        i += 1
+
+    print(recall_scores_1)
+    print(recall_scores_2)
+
+    plt.xlabel(r"Aantal samples")
+
+    x_labels = num_samples_array
+    # plt.ylabels(np.arange(0,1,0.1))
+    plt.yticks(np.arange(0, 1.1, 0.1))
+
+    plt.plot(x_labels, prec_scores_1, 'b')
+    plt.plot(x_labels, recall_scores_1, 'r')
+
+    plt.plot(x_labels, prec_scores_1, 'b.')
+    plt.plot(x_labels, recall_scores_1, 'r.')
+
+    plt.plot(x_labels, prec_scores_2, 'c:')
+    plt.plot(x_labels, recall_scores_2, 'm:')
+
+    # plt.plot(x_labels, prec_scores_2, 'cx')
+    # plt.plot(x_labels, recall_scores_2, 'mx')
+
+    plt.axhline(y=0.97, xmin=0, xmax=1, linewidth=0.5, color='blue', linestyle=':', hold=None)
+    plt.axhline(y=0.95, xmin=0, xmax=1, linewidth=0.5, color='red', linestyle=':', hold=None)
+
+    blue_line = mlines.Line2D([], [], color='blue', marker='.', label='precision softmax19+1')
+    red_line = mlines.Line2D([], [], color='red', marker='.', label="recall softmax19+1")
+    blue_line_2 = mlines.Line2D([], [], color='cyan', linestyle=':', label='precision softmax20')
+    red_line_2 = mlines.Line2D([], [], color='magenta', linestyle=':', label="recall softmax20")
+    blue_dash = mlines.Line2D([], [], color='blue', linestyle=':', linewidth=0.5, label='precision baseline')
+    red_dash = mlines.Line2D([], [], color='red', linestyle=':', linewidth=0.5, label='recall baseline')
+
+    plt.legend(handles=(blue_line,red_line , blue_line_2, red_line_2, blue_dash, red_dash))
+
+    ax = plt.subplot(111)
+    ax.set_xscale('log')
+    ax.set_xticks(x_labels)
+    ax.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    plt.title("", size=12)
+    plt.tight_layout()
+    plt.show()
+
+
 def main():
     mpl.rc('font', **{'size':'11','family': 'serif', 'sans-serif': ['Computer Modern']})
     mpl.rc('text', usetex='true')
     mpl.rc('lines',linewidth=1)
 
 
-    plot15augm()
+
+
+    # plotNaiveLayers()
+    # plotNaive15Layers2()
+    # plotNaive15()
+    # plotOneshotAll()
+    # plot14()
+    # plot15()
+    # plot15augm()
+    # plotVgl15Augm()
+    plot18x2()
+    # plotVgl19x1Naive()
+
+
+
     # plotNaive15()
     # plot14()
     # plot15()
@@ -472,3 +760,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
